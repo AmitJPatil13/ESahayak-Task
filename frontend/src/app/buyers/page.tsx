@@ -44,6 +44,12 @@ export default async function BuyersPage({ searchParams }: BuyersPageProps) {
           </div>
           <div className="mt-6 lg:mt-0 flex gap-4">
             <Link
+              href="/buyers/import"
+              className="btn-outline flex items-center gap-2 px-6 py-3"
+            >
+              Import CSV
+            </Link>
+            <Link
               href="/buyers/export"
               className="btn-secondary flex items-center gap-2 px-6 py-3"
             >

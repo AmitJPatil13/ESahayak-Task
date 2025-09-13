@@ -77,30 +77,17 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* Premium Stats Grid */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-slide-in-right">
+          {/* Quick Stats */}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
-              <div key={index} className="glass-card p-8 group hover:scale-105 transition-all duration-300">
-                <div className="flex items-center justify-between mb-6">
-                  <div className={`p-4 rounded-2xl bg-gradient-to-br ${
-                    stat.color === 'primary' ? 'from-indigo-500/20 to-purple-500/20' :
-                    stat.color === 'success' ? 'from-emerald-500/20 to-teal-500/20' :
-                    stat.color === 'accent' ? 'from-cyan-500/20 to-blue-500/20' :
-                    'from-amber-500/20 to-orange-500/20'
-                  }`}>
-                    <stat.icon className={`w-7 h-7 ${
-                      stat.color === 'primary' ? 'text-primary' :
-                      stat.color === 'success' ? 'text-success' :
-                      stat.color === 'accent' ? 'text-accent' :
-                      'text-warning'
-                    }`} />
+              <div key={index} className="glass-card p-6">
+                <div className="flex items-center gap-4">
+                  <stat.icon className="w-8 h-8 text-primary" />
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">{stat.value}</h3>
+                    <p className="text-secondary text-sm">{stat.label}</p>
                   </div>
-                  <span className="text-success font-bold text-sm bg-emerald-500/10 px-3 py-1 rounded-full">
-                    {stat.change}
-                  </span>
                 </div>
-                <h3 className="heading-md mb-2">{stat.value}</h3>
-                <p className="text-secondary font-medium">{stat.label}</p>
               </div>
             ))}
           </section>
@@ -196,28 +183,24 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="glass-card p-10 text-center group hover:scale-105 transition-all duration-300">
-              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <BarChart3 className="w-10 h-10 text-success" />
-              </div>
-              <h3 className="heading-md mb-4">Advanced Analytics</h3>
-              <p className="text-secondary mb-6 leading-relaxed">
-                Gain deep insights with comprehensive analytics and reporting to optimize your sales performance.
+            <div className="glass-card p-6 text-center">
+              <BarChart3 className="w-12 h-12 text-success mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">CSV Import/Export</h3>
+              <p className="text-secondary text-sm mb-4">
+                Bulk import and export buyer data via CSV files (max 200 rows)
               </p>
-              <Link href="/buyers" className="btn-outline">
-                View Analytics
+              <Link href="/buyers/import" className="btn-outline text-sm px-4 py-2">
+                Import Data
               </Link>
             </div>
 
-            <div className="glass-card p-10 text-center group hover:scale-105 transition-all duration-300">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <Building2 className="w-10 h-10 text-warning" />
-              </div>
-              <h3 className="heading-md mb-4">Smart Matching</h3>
-              <p className="text-secondary mb-6 leading-relaxed">
-                Intelligent property-buyer matching system powered by advanced algorithms and preferences.
+            <div className="glass-card p-6 text-center">
+              <Building2 className="w-12 h-12 text-warning mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">Property Types</h3>
+              <p className="text-secondary text-sm mb-4">
+                Support for apartments, villas, plots, and commercial spaces
               </p>
-              <Link href="/buyers/new" className="btn-outline">
+              <Link href="/buyers/new" className="btn-outline text-sm px-4 py-2">
                 Add Buyer
               </Link>
             </div>
