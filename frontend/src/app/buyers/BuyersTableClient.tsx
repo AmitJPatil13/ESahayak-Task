@@ -1,26 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { BuyerType } from '@/lib/zod-schemas';
 import { mockApi } from '@/lib/mockApi';
 import { useToast } from '@/contexts/ToastContext';
-import { Trash2, Eye, Edit } from 'lucide-react';
+import { Eye, Edit, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-interface BuyersTableProps {
+interface BuyersTableClientProps {
   buyers: BuyerType[];
-  onBuyerDeleted?: () => void;
 }
 
-export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps) {
+export default function BuyersTableClient({ buyers }: BuyersTableClientProps) {
   const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<{buyerId: string, buyerName: string} | null>(null);
+  const [localBuyers, setLocalBuyers] = useState(buyers);
   const isCompact = density === 'compact';
   const tableTextClass = isCompact ? 'text-sm' : 'text-base';
+  const router = useRouter();
 
   const { showSuccess, showError } = useToast();
-
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<{buyerId: string, buyerName: string} | null>(null);
 
   const handleDeleteClick = (buyerId: string, buyerName: string) => {
     setShowDeleteConfirm({buyerId, buyerName});
@@ -34,8 +35,13 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
     try {
       await mockApi.deleteBuyer(buyerId);
       showSuccess('Buyer Deleted', `${buyerName} has been successfully deleted.`);
-      onBuyerDeleted?.();
+      
+      // Update local state immediately for instant UI feedback
+      setLocalBuyers(prev => prev.filter(buyer => buyer.id !== buyerId));
       setShowDeleteConfirm(null);
+      
+      // Refresh the page data
+      router.refresh();
     } catch (error) {
       console.error('Error deleting buyer:', error);
       showError('Delete Failed', 'Failed to delete buyer. Please try again.');
@@ -73,7 +79,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
         return 'bg-purple-500/10 text-purple-400 border-purple-500/30';
       case 'negotiation':
         return 'bg-orange-500/10 text-orange-400 border-orange-500/30';
-      case 'closed':
+      case 'converted':
         return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
       case 'lost':
         return 'bg-red-500/10 text-red-400 border-red-500/30';
@@ -82,97 +88,135 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
     }
   };
 
-  const getInitialsColor = (name: string) => {
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getAvatarColor = (name: string) => {
     const colors = [
-      'from-indigo-500/20 to-purple-500/20 text-primary',
-      'from-emerald-500/20 to-teal-500/20 text-success',
-      'from-cyan-500/20 to-blue-500/20 text-accent',
-      'from-amber-500/20 to-orange-500/20 text-warning',
-      'from-pink-500/20 to-rose-500/20 text-error',
+      'bg-gradient-to-br from-blue-500 to-cyan-500',
+      'bg-gradient-to-br from-purple-500 to-pink-500',
+      'bg-gradient-to-br from-green-500 to-emerald-500',
+      'bg-gradient-to-br from-orange-500 to-red-500',
+      'bg-gradient-to-br from-indigo-500 to-purple-500',
+      'bg-gradient-to-br from-pink-500 to-rose-500',
     ];
     const index = name.charCodeAt(0) % colors.length;
     return colors[index];
   };
 
   return (
-    <div className="glass-card overflow-hidden rounded-2xl border border-white/10">
-      {/* Table toolbar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-gradient-to-r from-slate-800/30 to-slate-700/30">
-        <div className="text-sm text-gray-300 font-medium">
-          <span className="text-white font-semibold">{buyers.length}</span> {buyers.length === 1 ? 'buyer' : 'buyers'}
+    <div className="glass-card rounded-2xl border border-white/10 overflow-hidden">
+      {/* Table Header */}
+      <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-white">Buyer Leads</h3>
+          <p className="text-sm text-gray-400 mt-1">{localBuyers.length} leads found</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setDensity(isCompact ? 'comfortable' : 'compact')}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 text-indigo-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-500/20 hover:to-purple-500/20 transition-all duration-200 text-xs font-medium shadow-sm"
-          aria-label="Toggle density"
-        >
-          <div className="w-2 h-2 rounded-full bg-current"></div>
-          {isCompact ? 'Comfortable' : 'Compact'}
-        </button>
+        
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-white/5 rounded-lg p-1">
+            <button
+              onClick={() => setDensity('comfortable')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
+                density === 'comfortable'
+                  ? 'bg-white/10 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Comfortable
+            </button>
+            <button
+              onClick={() => setDensity('compact')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
+                density === 'compact'
+                  ? 'bg-white/10 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Compact
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Table */}
       <div className="overflow-x-auto">
-        <table className={`w-full ${tableTextClass}`}>
-          <thead className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 backdrop-blur-sm">
-            <tr className="border-b border-white/10">
-              <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Buyer</th>
-              <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Contact</th>
-              <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Property</th>
-              <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Budget</th>
-              <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Status</th>
-              <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Date</th>
-              <th className="text-right py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Actions</th>
+        <table className="min-w-full divide-y divide-white/10">
+          <thead className="bg-white/5">
+            <tr>
+              <th className={`${isCompact ? 'px-4 py-2' : 'px-6 py-3'} text-left text-xs font-medium text-gray-300 uppercase tracking-wider`}>
+                Buyer
+              </th>
+              <th className={`${isCompact ? 'px-4 py-2' : 'px-6 py-3'} text-left text-xs font-medium text-gray-300 uppercase tracking-wider`}>
+                Contact
+              </th>
+              <th className={`${isCompact ? 'px-4 py-2' : 'px-6 py-3'} text-left text-xs font-medium text-gray-300 uppercase tracking-wider`}>
+                Property
+              </th>
+              <th className={`${isCompact ? 'px-4 py-2' : 'px-6 py-3'} text-left text-xs font-medium text-gray-300 uppercase tracking-wider`}>
+                Budget
+              </th>
+              <th className={`${isCompact ? 'px-4 py-2' : 'px-6 py-3'} text-left text-xs font-medium text-gray-300 uppercase tracking-wider`}>
+                Status
+              </th>
+              <th className={`${isCompact ? 'px-4 py-2' : 'px-6 py-3'} text-right text-xs font-medium text-gray-300 uppercase tracking-wider`}>
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody>
-            {buyers.map((buyer) => (
-              <tr key={buyer.id} className="group hover:bg-gradient-to-r hover:from-white/5 hover:to-indigo-500/5 border-b border-white/5 transition-all duration-300 hover:shadow-sm">
+          <tbody className="divide-y divide-white/5">
+            {localBuyers.map((buyer) => (
+              <tr key={buyer.id} className="group hover:bg-white/5 transition-all duration-200">
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
-                  <div className="flex items-center gap-4">
-                    <div className={`${isCompact ? 'w-10 h-10 text-sm' : 'w-12 h-12 text-base'} bg-gradient-to-br ${getInitialsColor(buyer.fullName)} rounded-xl flex items-center justify-center font-bold shadow-lg flex-shrink-0 ring-2 ring-white/10 group-hover:ring-white/20 transition-all duration-300`}>
-                      {buyer.fullName.charAt(0).toUpperCase()}
+                  <div className="flex items-center">
+                    <div className={`${isCompact ? 'h-8 w-8' : 'h-10 w-10'} ${getAvatarColor(buyer.fullName)} rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg`}>
+                      {getInitials(buyer.fullName)}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className={`font-semibold text-white truncate group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.fullName}</div>
-                      <div className="text-gray-400 text-xs truncate group-hover:text-gray-300 transition-colors duration-200">{buyer.city}</div>
+                    <div className="ml-4">
+                      <div className={`font-medium text-white ${tableTextClass} group-hover:text-blue-300 transition-colors duration-200`}>
+                        {buyer.fullName}
+                      </div>
+                      <div className="text-gray-400 text-sm">
+                        {buyer.city}
+                      </div>
                     </div>
                   </div>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
                   <div className="space-y-1">
-                    <div className={`text-white font-medium group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.phone}</div>
+                    <div className={`text-gray-300 ${tableTextClass}`}>{buyer.phone}</div>
                     {buyer.email && (
-                      <div className="text-gray-400 text-xs truncate group-hover:text-gray-300 transition-colors duration-200">{buyer.email}</div>
+                      <div className="text-gray-400 text-sm">{buyer.email}</div>
                     )}
                   </div>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
                   <div className="space-y-1">
-                    <div className={`text-white font-medium truncate group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.propertyType}</div>
-                    <div className="text-gray-400 text-xs truncate group-hover:text-gray-300 transition-colors duration-200">
-                      {buyer.bhk ? `${buyer.bhk} BHK` : 'Any'} • {buyer.purpose}
+                    <div className={`text-gray-300 ${tableTextClass}`}>
+                      {buyer.bhk} BHK {buyer.propertyType}
                     </div>
+                    <div className="text-gray-400 text-sm">{buyer.purpose}</div>
                   </div>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
-                  <div className={`text-white font-medium group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>
-                    {buyer.budgetMin && buyer.budgetMax ? 
-                      `${formatCurrency(buyer.budgetMin).replace(',00,000', 'L')} - ${formatCurrency(buyer.budgetMax).replace(',00,000', 'L')}` : 
-                      formatCurrency(buyer.budgetMin || buyer.budgetMax)?.replace(',00,000', 'L')
-                    }
+                  <div className="space-y-1">
+                    <div className={`text-gray-300 font-medium ${tableTextClass}`}>
+                      {formatCurrency(buyer.budgetMin)} - {formatCurrency(buyer.budgetMax)}
+                    </div>
+                    <div className="text-gray-400 text-sm">{buyer.timeline}</div>
                   </div>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
-                  <span className={`inline-flex items-center ${isCompact ? 'px-3 py-1.5' : 'px-4 py-2'} rounded-full text-xs font-semibold border shadow-sm group-hover:shadow-md transition-all duration-200 ${getStatusColor(buyer.status)}`}>
-                    <span className="w-2 h-2 rounded-full bg-current mr-2 animate-pulse"></span>
-                    {buyer.status}
-                  </span>
-                </td>
-                <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
-                  <div className={`text-gray-400 font-medium group-hover:text-gray-300 transition-colors duration-200 ${isCompact ? 'text-xs' : 'text-sm'}`}>
-                    {formatDate(buyer.createdAt).split(' ').map((part, i) => (
-                      <div key={i}>{part}</div>
-                    ))}
+                  <div className="flex items-center">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(buyer.status)}`}>
+                      {buyer.status}
+                    </span>
                   </div>
                 </td>
                 <td className={`text-right ${isCompact ? 'py-3' : 'py-4'} px-6`}>

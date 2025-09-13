@@ -1,6 +1,6 @@
 import { mockApi } from '@/lib/mockApi';
 import { BuyerFiltersType } from '@/lib/zod-schemas';
-import BuyersTable from './BuyersTable';
+import BuyersTableClient from './BuyersTableClient';
 import Pagination from './Pagination';
 import EmptyState from '@/components/EmptyState';
 
@@ -42,7 +42,7 @@ export default async function BuyersList({ filters }: BuyersListProps) {
 
   return (
     <div className="space-y-8">
-      <BuyersTable buyers={response.items} />
+      <BuyersTableClient buyers={response.items} />
       
       <div className="flex justify-center">
         <Pagination

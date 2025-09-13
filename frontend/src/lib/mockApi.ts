@@ -194,7 +194,7 @@ export const mockApi = {
 
   // Buyers CRUD
   async getBuyers(filters: BuyerFiltersType = {}): Promise<BuyerListResponseType> {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 50));
     
     const filtered = filterBuyers(mockBuyers, filters);
     const page = filters.page || 1;
@@ -211,7 +211,7 @@ export const mockApi = {
   },
 
   async getBuyer(id: string): Promise<{ buyer: BuyerType; history: BuyerHistoryType[] } | null> {
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise(resolve => setTimeout(resolve, 50));
     
     const buyer = mockBuyers.find(b => b.id === id);
     if (!buyer) return null;
@@ -221,7 +221,7 @@ export const mockApi = {
   },
 
   async createBuyer(data: BuyerCreateType): Promise<BuyerType> {
-    await new Promise(resolve => setTimeout(resolve, 400));
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     const newBuyer: BuyerType = {
       ...data,
