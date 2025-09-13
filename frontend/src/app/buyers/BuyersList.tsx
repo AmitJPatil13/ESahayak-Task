@@ -22,7 +22,7 @@ export default async function BuyersList({ filters }: BuyersListProps) {
         }}
         icon={
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12 text-muted"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

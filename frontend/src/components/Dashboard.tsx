@@ -149,11 +149,11 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-2xl card-hover">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Buyers</p>
+              <p className="text-sm font-medium text-muted">Total Buyers</p>
               <p className="text-3xl font-bold gradient-text">{stats.totalBuyers}</p>
             </div>
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-white" />
+              <Users className="w-6 h-6 text-primary" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
@@ -165,15 +165,15 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-2xl card-hover">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Buyers</p>
+              <p className="text-sm font-medium text-muted">Active Buyers</p>
               <p className="text-3xl font-bold gradient-text">{stats.activeBuyers}</p>
             </div>
             <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-              <Activity className="w-6 h-6 text-white" />
+              <Activity className="w-6 h-6 text-primary" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-600">
+            <span className="text-muted">
               {stats.conversionRate.toFixed(1)}% conversion rate
             </span>
           </div>
@@ -182,17 +182,17 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-2xl card-hover">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Value</p>
+              <p className="text-sm font-medium text-muted">Total Value</p>
               <p className="text-3xl font-bold gradient-text">
                 ₹{(stats.totalValue / 10000000).toFixed(1)}Cr
               </p>
             </div>
             <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-white" />
+              <DollarSign className="w-6 h-6 text-primary" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-600">
+            <span className="text-muted">
               Avg: ₹{(stats.avgBudget / 100000).toFixed(1)}L
             </span>
           </div>
@@ -201,15 +201,15 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-2xl card-hover">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Recent Activity</p>
+              <p className="text-sm font-medium text-muted">Recent Activity</p>
               <p className="text-3xl font-bold gradient-text">{stats.recentActivity}</p>
             </div>
             <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-              <Clock className="w-6 h-6 text-white" />
+              <Clock className="w-6 h-6 text-primary" />
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-600">Last 7 days</span>
+            <span className="text-muted">Last 7 days</span>
           </div>
         </div>
       </div>
@@ -220,7 +220,7 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-2xl">
           <div className="flex items-center mb-6">
             <MapPin className="w-5 h-5 text-blue-500 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Top Cities</h3>
+            <h3 className="text-lg font-semibold text-primary">Top Cities</h3>
           </div>
           <div className="space-y-4">
             {cityStats.map((city, index) => (
@@ -233,17 +233,17 @@ export default function Dashboard() {
                     index === 3 ? 'from-orange-500 to-red-500' :
                     'from-gray-400 to-gray-500'
                   }`}></div>
-                  <span className="text-sm font-medium text-gray-700">{city.city}</span>
+                  <span className="text-sm font-medium text-secondary">{city.city}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-sm text-gray-600 mr-2">{city.count}</span>
+                  <span className="text-sm text-muted mr-2">{city.count}</span>
                   <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
                       style={{ width: `${city.percentage}%` }}
                     ></div>
                   </div>
-                  <span className="text-xs text-gray-500 ml-2">{city.percentage.toFixed(1)}%</span>
+                  <span className="text-xs text-muted ml-2">{city.percentage.toFixed(1)}%</span>
                 </div>
               </div>
             ))}
@@ -254,17 +254,17 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-2xl">
           <div className="flex items-center mb-6">
             <BarChart3 className="w-5 h-5 text-green-500 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Status Overview</h3>
+            <h3 className="text-lg font-semibold text-primary">Status Overview</h3>
           </div>
           <div className="space-y-4">
             {statusStats.map((status) => (
               <div key={status.status} className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className={`w-3 h-3 rounded-full mr-3 ${status.color}`}></div>
-                  <span className="text-sm font-medium text-gray-700">{status.status}</span>
+                  <span className="text-sm font-medium text-secondary">{status.status}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-lg font-semibold text-gray-900">{status.count}</span>
+                  <span className="text-lg font-semibold text-primary">{status.count}</span>
                 </div>
               </div>
             ))}
@@ -274,7 +274,7 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="glass-card p-6 rounded-2xl">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <h3 className="text-lg font-semibold text-primary mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button className="btn-primary flex items-center justify-center gap-2 py-3">
             <Users className="w-4 h-4" />

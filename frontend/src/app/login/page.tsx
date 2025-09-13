@@ -34,34 +34,40 @@ export default function LoginPage() {
     if (success) {
       router.push('/');
     } else {
-      setError('Invalid credentials. Try admin@esahayak.com or agent@esahayak.com with any password (3+ chars)');
+      setError('Invalid credentials. Use demo@esahayak.com with any password (3+ chars)');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen transition-colors duration-300 flex items-center justify-center p-4" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
+      <div className="w-full max-w-lg">
         {/* Logo/Brand */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold gradient-text mb-2">ESahayak</h1>
-          <p className="text-secondary">Real Estate Lead Management</p>
+          <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <span className="text-white text-2xl font-bold">ES</span>
+          </div>
+          <h1 className="text-4xl font-bold gradient-text mb-3">ESahayak</h1>
+          <p className="text-secondary text-lg">Real Estate Lead Management</p>
         </div>
 
         {/* Login Form */}
-        <div className="glass-card p-8 rounded-2xl">
+        <div className="glass-card p-10 rounded-2xl shadow-2xl">
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-white mb-2">Welcome Back</h2>
+            <h2 className="text-2xl font-semibold text-primary mb-2">Welcome Back</h2>
             <p className="text-secondary">Sign in to your account to continue</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-white mb-3">
+              <label htmlFor="email" className="block text-sm font-semibold text-primary mb-3">
                 Email Address
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary w-5 h-5" />
+                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary w-5 h-5" />
                 <input
                   type="email"
                   id="email"
@@ -76,11 +82,11 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-white mb-3">
+              <label htmlFor="password" className="block text-sm font-semibold text-primary mb-3">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary w-5 h-5" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary w-5 h-5" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
@@ -93,7 +99,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-white transition"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-secondary hover:text-primary transition"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -109,11 +115,22 @@ export default function LoginPage() {
 
             {/* Demo Credentials */}
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-              <h4 className="text-blue-400 font-semibold mb-2">Demo Credentials</h4>
-              <div className="space-y-1 text-sm text-blue-300">
-                <p><strong>Admin:</strong> admin@esahayak.com</p>
-                <p><strong>Agent:</strong> agent@esahayak.com</p>
-                <p><strong>Password:</strong> Any password (3+ characters)</p>
+              <h4 className="text-blue-400 font-semibold mb-3">Demo Login</h4>
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('demo@esahayak.com');
+                    setPassword('demo123');
+                  }}
+                  className="w-full px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
+                >
+                  Fill Demo Credentials
+                </button>
+                <div className="text-xs text-blue-300/80 text-center">
+                  <p><strong>Email:</strong> demo@esahayak.com</p>
+                  <p><strong>Password:</strong> Any password (3+ characters)</p>
+                </div>
               </div>
             </div>
 
@@ -133,10 +150,19 @@ export default function LoginPage() {
           </form>
 
           {/* Footer */}
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center space-y-4">
+            <div className="flex items-center justify-center gap-4 text-xs text-muted">
+              <button className="hover:text-primary transition-colors">Forgot Password?</button>
+              <span>•</span>
+              <button className="hover:text-primary transition-colors">Contact Support</button>
+            </div>
             <p className="text-secondary text-sm">
               Don't have an account? Contact your administrator
             </p>
+            <div className="flex items-center justify-center gap-2 text-xs text-muted">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Secure Login • v1.0.0</span>
+            </div>
           </div>
         </div>
       </div>

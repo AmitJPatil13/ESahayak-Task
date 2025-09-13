@@ -1,7 +1,31 @@
 import { BuyerType, BuyerCreateType, BuyerUpdateType, BuyerFiltersType, BuyerListResponseType, UserType, BuyerHistoryType } from './zod-schemas';
 
-// Mock data store
-let mockBuyers: BuyerType[] = [
+// Mock data store - using localStorage for persistence
+const STORAGE_KEY = 'esahayak_buyers';
+
+// Load buyers from localStorage or use default data
+const loadBuyers = (): BuyerType[] => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to parse stored buyers, using defaults');
+      }
+    }
+  }
+  return defaultBuyers;
+};
+
+// Save buyers to localStorage
+const saveBuyers = (buyers: BuyerType[]) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(buyers));
+  }
+};
+
+const defaultBuyers: BuyerType[] = [
   {
     id: '1',
     fullName: 'Rajesh Kumar',
@@ -100,6 +124,9 @@ let mockBuyers: BuyerType[] = [
     updatedAt: new Date(Date.now() - 345600000).toISOString(),
   },
 ];
+
+// Initialize buyers data
+let mockBuyers: BuyerType[] = loadBuyers();
 
 let mockHistory: BuyerHistoryType[] = [
   {
@@ -233,6 +260,7 @@ export const mockApi = {
     };
     
     mockBuyers.unshift(newBuyer);
+    saveBuyers(mockBuyers); // Persist to localStorage
     
     // Add history entry
     const historyEntry: BuyerHistoryType = {
@@ -269,6 +297,7 @@ export const mockApi = {
     };
     
     mockBuyers[buyerIndex] = updatedBuyer;
+    saveBuyers(mockBuyers); // Persist to localStorage
     
     // Add history entry
     const changes: Record<string, any> = {};
@@ -306,6 +335,7 @@ export const mockApi = {
     }
     
     mockBuyers.splice(buyerIndex, 1);
+    saveBuyers(mockBuyers); // Persist to localStorage
     
     // Remove history entries
     mockHistory = mockHistory.filter(h => h.buyerId !== id);

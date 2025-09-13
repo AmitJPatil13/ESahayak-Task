@@ -45,27 +45,30 @@ export default function ExportPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen transition-colors duration-300" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
             <BackButton href="/buyers" label="Back to Buyers" />
           </div>
 
           {/* Header Section */}
-          <div className="glass-card rounded-2xl p-8 mb-8 border border-white/10">
+          <div className="glass-card rounded-2xl p-8 mb-8 border border-border/20">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Download className="w-8 h-8 text-green-400" />
               </div>
               <h1 className="text-4xl font-bold gradient-text mb-3">Export Buyer Data</h1>
-              <p className="text-gray-300 text-lg">Download your buyer leads as CSV file with advanced filtering options</p>
+              <p className="text-secondary text-lg">Download your buyer leads as CSV file with advanced filtering options</p>
             </div>
           </div>
 
           <div className="space-y-8">
             {/* Export Options */}
-            <div className="glass-card rounded-2xl p-8 border border-white/10">
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <div className="glass-card rounded-2xl p-8 border border-border/20">
+              <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center">
                   <Filter className="w-5 h-5 text-blue-400" />
                 </div>
@@ -74,7 +77,7 @@ export default function ExportPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-3">
+                  <label className="block text-sm font-semibold text-primary mb-3">
                     City Filter
                   </label>
                   <select
@@ -91,7 +94,7 @@ export default function ExportPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-3">
+                  <label className="block text-sm font-semibold text-primary mb-3">
                     Status Filter
                   </label>
                   <select
@@ -113,7 +116,7 @@ export default function ExportPage() {
             </div>
 
             {/* Export Button */}
-            <div className="glass-card rounded-2xl p-8 border border-white/10">
+            <div className="glass-card rounded-2xl p-8 border border-border/20">
               <div className="text-center">
                 <button
                   onClick={handleExport}
@@ -132,7 +135,7 @@ export default function ExportPage() {
                     </>
                   )}
                 </button>
-                <p className="text-gray-400 text-sm mt-4">
+                <p className="text-muted text-sm mt-4">
                   Export will include all buyer data matching your selected filters
                 </p>
               </div>

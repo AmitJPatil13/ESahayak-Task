@@ -19,14 +19,14 @@ export default function NotFound() {
             />
           </svg>
         </div>
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Page not found</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="mt-2 text-sm font-semibold text-primary">Page not found</h3>
+        <p className="mt-1 text-sm text-muted">
           Sorry, we couldn't find the page you're looking for.
         </p>
         <div className="mt-6">
           <Link
             href="/buyers"
-            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-primary shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             Go to Buyers
           </Link>

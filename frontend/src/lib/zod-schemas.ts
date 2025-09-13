@@ -11,7 +11,7 @@ export const Status = z.enum(['New','Qualified','Contacted','Visited','Negotiati
 
 export const BuyerBase = z.object({
   fullName: z.string().min(2).max(80),
-  email: z.string().email().optional(),
+  email: z.string().optional(),
   phone: z.string().regex(/^\d{10,15}$/, "phone must be 10-15 digits"),
   city: City,
   propertyType: PropertyType,
@@ -22,7 +22,7 @@ export const BuyerBase = z.object({
   timeline: Timeline,
   source: Source,
   notes: z.string().max(1000).optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).default([]),
   status: Status.optional(),
 });
 

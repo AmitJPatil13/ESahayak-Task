@@ -64,14 +64,14 @@ export default function Toast({ id, type, title, message, duration = 5000, onClo
       <div className="flex items-start gap-3">
         {getIcon()}
         <div className="flex-1 min-w-0">
-          <h4 className="text-white font-semibold text-sm">{title}</h4>
+          <h4 className="text-primary font-semibold text-sm">{title}</h4>
           {message && (
-            <p className="text-gray-300 text-xs mt-1">{message}</p>
+            <p className="text-secondary text-xs mt-1">{message}</p>
           )}
         </div>
         <button
           onClick={handleClose}
-          className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
+          className="text-muted hover:text-primary transition-colors p-1 rounded-lg hover:bg-surface/30"
         >
           <X className="w-4 h-4" />
         </button>

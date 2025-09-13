@@ -6,6 +6,7 @@ import { mockApi } from '@/lib/mockApi';
 import { BuyerCreateType } from '@/lib/zod-schemas';
 import LoadingButton from '@/components/LoadingButton';
 import { BuyerCreate, City, PropertyType, BHK, Purpose, Timeline, Source, Status } from '@/lib/zod-schemas';
+import { useToast } from '@/contexts/ToastContext';
 
 interface BuyerFormProps {
   initialData?: Partial<BuyerCreateType>;
@@ -15,6 +16,7 @@ interface BuyerFormProps {
 
 export default function BuyerForm({ buyer }: { buyer?: any }) {
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
   const isEdit = !!buyer;
   const buyerId = buyer?.id;
   const [formData, setFormData] = useState<Partial<BuyerCreateType>>({
@@ -23,11 +25,11 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
     phone: '',
     city: 'Chandigarh',
     propertyType: 'Apartment',
-    bhk: undefined,
+    bhk: '3',
     purpose: 'Buy',
     budgetMin: undefined,
     budgetMax: undefined,
-    timeline: 'Within 3 months',
+    timeline: '0-3m',
     source: 'Website',
     status: 'New',
     tags: [],
@@ -35,16 +37,29 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
     ...buyer,
   });
   
+  // Set default BHK for Apartment/Villa
+  useEffect(() => {
+    if (['Apartment', 'Villa'].includes(formData.propertyType || '') && !formData.bhk) {
+      setFormData(prev => ({ ...prev, bhk: '3' }));
+    }
+  }, [formData.propertyType]);
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tagInput, setTagInput] = useState('');
 
   const validateForm = () => {
     try {
-      BuyerCreate.parse(formData);
+      const validationData = {
+        ...formData,
+        budgetMin: formData.budgetMin ? Number(formData.budgetMin) : undefined,
+        budgetMax: formData.budgetMax ? Number(formData.budgetMax) : undefined,
+      };
+      BuyerCreate.parse(validationData);
       setErrors({});
       return true;
     } catch (error: any) {
+      console.log('Validation errors:', error.errors);
       const newErrors: Record<string, string> = {};
       error.errors?.forEach((err: any) => {
         const path = err.path.join('.');
@@ -57,11 +72,14 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
     
     if (!validateForm()) {
+      console.log('Form validation failed');
       return;
     }
 
+    console.log('Form validation passed, creating buyer...');
     setIsSubmitting(true);
     try {
       if (isEdit && buyerId) {
@@ -71,15 +89,61 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
           updatedAt: new Date().toISOString(),
         });
       } else {
-        await mockApi.createBuyer(formData as BuyerCreateType);
+        const validationData = {
+          ...formData,
+          email: formData.email || undefined,
+          notes: formData.notes || undefined,
+          budgetMin: formData.budgetMin ? Number(formData.budgetMin) : undefined,
+          budgetMax: formData.budgetMax ? Number(formData.budgetMax) : undefined,
+        };
+        
+        console.log('Creating buyer with data:', validationData);
+        const newBuyer = await mockApi.createBuyer(validationData as BuyerCreateType);
+        console.log('Buyer created successfully:', newBuyer);
+        
+        // Show professional success toast
+        showSuccess(
+          'Buyer Created Successfully!',
+          `${validationData.fullName} has been added to your buyers database.`
+        );
+        
+        // Clear form after successful creation
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          city: 'Chandigarh',
+          propertyType: 'Apartment',
+          bhk: '3',
+          purpose: 'Buy',
+          budgetMin: undefined,
+          budgetMax: undefined,
+          timeline: '0-3m',
+          source: 'Website',
+          status: 'New',
+          tags: [],
+          notes: '',
+        });
+        setTagInput('');
+        
+        // Force a small delay to ensure localStorage is updated
+        setTimeout(() => {
+          router.push('/buyers');
+        }, 100);
       }
       
-      router.push('/buyers');
+      // For edit mode, also redirect
+      if (isEdit) {
+        router.push('/buyers');
+      }
     } catch (error: any) {
+      console.error('Error saving buyer:', error);
       if (error.message.includes('CONFLICT')) {
         setErrors({ general: error.message });
+        showError('Update Conflict', error.message);
       } else {
         setErrors({ general: 'An error occurred while saving the buyer.' });
+        showError('Save Failed', 'An error occurred while saving the buyer. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
@@ -118,7 +182,10 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
   const requiresBHK = ['Apartment', 'Villa'].includes(formData.propertyType || '');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen transition-colors duration-300" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="glass-card rounded-2xl p-12">
@@ -149,7 +216,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {/* Full Name */}
               <div className="lg:col-span-1">
-                <label htmlFor="fullName" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="fullName" className="block text-sm font-semibold text-primary mb-3">
                   Full Name *
                 </label>
                 <input
@@ -172,7 +239,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* Email */}
               <div className="lg:col-span-1">
-                <label htmlFor="email" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="email" className="block text-sm font-semibold text-primary mb-3">
                   Email Address
                 </label>
                 <input
@@ -195,7 +262,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* Phone */}
               <div className="lg:col-span-1">
-                <label htmlFor="phone" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="phone" className="block text-sm font-semibold text-primary mb-3">
                   Phone Number *
                 </label>
                 <input
@@ -218,7 +285,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* City */}
               <div className="lg:col-span-1">
-                <label htmlFor="city" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="city" className="block text-sm font-semibold text-primary mb-3">
                   City *
                 </label>
                 <select
@@ -237,7 +304,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* Property Type */}
               <div className="lg:col-span-1">
-                <label htmlFor="propertyType" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="propertyType" className="block text-sm font-semibold text-primary mb-3">
                   Property Type *
                 </label>
                 <select
@@ -257,7 +324,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
               {/* BHK - Conditional */}
               {requiresBHK && (
                 <div className="lg:col-span-1">
-                  <label htmlFor="bhk" className="block text-sm font-semibold text-white mb-3">
+                  <label htmlFor="bhk" className="block text-sm font-semibold text-primary mb-3">
                     BHK Configuration *
                   </label>
                   <select
@@ -286,7 +353,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* Purpose */}
               <div className="lg:col-span-1">
-                <label htmlFor="purpose" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="purpose" className="block text-sm font-semibold text-primary mb-3">
                   Purpose *
                 </label>
                 <select
@@ -305,7 +372,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* Budget Range */}
               <div className="lg:col-span-1">
-                <label htmlFor="budgetMin" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="budgetMin" className="block text-sm font-semibold text-primary mb-3">
                   Budget Min (₹)
                 </label>
                 <input
@@ -327,7 +394,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
               </div>
 
               <div className="lg:col-span-1">
-                <label htmlFor="budgetMax" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="budgetMax" className="block text-sm font-semibold text-primary mb-3">
                   Budget Max (₹)
                 </label>
                 <input
@@ -350,7 +417,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* Timeline */}
               <div className="lg:col-span-1">
-                <label htmlFor="timeline" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="timeline" className="block text-sm font-semibold text-primary mb-3">
                   Timeline *
                 </label>
                 <select
@@ -369,7 +436,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
               {/* Source */}
               <div className="lg:col-span-1">
-                <label htmlFor="source" className="block text-sm font-semibold text-white mb-3">
+                <label htmlFor="source" className="block text-sm font-semibold text-primary mb-3">
                   Lead Source *
                 </label>
                 <select
@@ -389,7 +456,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
               {/* Status - Only for edit */}
               {isEdit && (
                 <div className="lg:col-span-1">
-                  <label htmlFor="status" className="block text-sm font-semibold text-white mb-3">
+                  <label htmlFor="status" className="block text-sm font-semibold text-primary mb-3">
                     Lead Status
                   </label>
                   <select
@@ -410,7 +477,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
             {/* Notes */}
             <div className="lg:col-span-3 mt-8">
-              <label htmlFor="notes" className="block text-sm font-semibold text-white mb-3">
+              <label htmlFor="notes" className="block text-sm font-semibold text-primary mb-3">
                 Additional Notes
               </label>
               <textarea
@@ -433,7 +500,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
 
             {/* Tags */}
             <div className="lg:col-span-3 mt-8">
-              <label htmlFor="tags" className="block text-sm font-semibold text-white mb-3">
+              <label htmlFor="tags" className="block text-sm font-semibold text-primary mb-3">
                 Tags & Labels
               </label>
               <div className="mb-4">

@@ -80,30 +80,33 @@ Jane Smith,jane@example.com,9876543211,Mohali,Villa,4,Buy,8000000,12000000,3-6m,
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen transition-colors duration-300" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}
-          <div className="glass-card rounded-2xl p-8 mb-8 border border-white/10">
+          <div className="glass-card rounded-2xl p-8 mb-8 border border-border/20">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Upload className="w-8 h-8 text-blue-400" />
               </div>
               <h1 className="text-4xl font-bold gradient-text mb-3">Import Buyer Data</h1>
-              <p className="text-gray-300 text-lg">Upload CSV file to import buyer leads (max 200 rows)</p>
+              <p className="text-secondary text-lg">Upload CSV file to import buyer leads (max 200 rows)</p>
             </div>
           </div>
 
           <div className="space-y-8">
             {/* Template Download */}
-            <div className="glass-card rounded-2xl p-6 border border-white/10">
+            <div className="glass-card rounded-2xl p-6 border border-border/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center">
                     <Download className="w-6 h-6 text-green-400" />
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold text-lg">Need a template?</h3>
-                    <p className="text-gray-300">Download our CSV template with sample data and proper formatting</p>
+                    <h3 className="text-primary font-semibold text-lg">Need a template?</h3>
+                    <p className="text-secondary">Download our CSV template with sample data and proper formatting</p>
                   </div>
                 </div>
                 <button
@@ -117,12 +120,12 @@ Jane Smith,jane@example.com,9876543211,Mohali,Villa,4,Buy,8000000,12000000,3-6m,
             </div>
 
             {/* File Upload Area */}
-            <div className="glass-card rounded-2xl p-8 border border-white/10">
+            <div className="glass-card rounded-2xl p-8 border border-border/20">
               <div
                 className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-200 ${
                   dragActive 
                     ? 'border-primary/50 bg-primary/5 scale-105' 
-                    : 'border-white/20 hover:border-white/30 hover:bg-white/5'
+                    : 'border-border/40 hover:border-white/30 hover:bg-surface/20'
                 }`}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -131,13 +134,13 @@ Jane Smith,jane@example.com,9876543211,Mohali,Villa,4,Buy,8000000,12000000,3-6m,
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <FileText className="w-10 h-10 text-purple-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">
+                <h3 className="text-2xl font-bold text-primary mb-3">
                   Drop your CSV file here
                 </h3>
-                <p className="text-gray-300 mb-2">
+                <p className="text-secondary mb-2">
                   or click to browse and select from your computer
                 </p>
-                <p className="text-gray-400 text-sm mb-8">
+                <p className="text-muted text-sm mb-8">
                   Supports CSV files up to 200 rows • Maximum file size: 5MB
                 </p>
                 <button

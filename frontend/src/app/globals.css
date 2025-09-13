@@ -13,20 +13,48 @@
 :root {
   --primary: #6366f1;
   --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --secondary: #64748b;
-  --accent: #06b6d4;
+  --secondary: #8b5cf6;
   --success: #10b981;
   --warning: #f59e0b;
   --error: #ef4444;
+  --background: #0f172a;
+  --surface: #334155;
+  --surface-light: #475569;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border: #475569;
+  --border-light: #64748b;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
   --background: #0f0f23;
-  --surface: #1a1a2e;
-  --surface-light: #16213e;
+  --background-secondary: #1a1a2e;
+  --surface: #16213e;
+  --surface-hover: #0e3460;
   --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
   --border: #334155;
   --border-light: #475569;
+  --glass-bg: rgba(22, 33, 62, 0.7);
+  --glass-border: rgba(148, 163, 184, 0.15);
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --background: #ffffff;
+  --background-secondary: #f8fafc;
+  --surface: #ffffff;
+  --surface-hover: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --border-light: #cbd5e1;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(15, 23, 42, 0.1);
 }
 
 body {
@@ -77,16 +105,19 @@ body {
 
 /* Premium Glass Card */
 .glass-card {
-  background: rgba(26, 26, 46, 0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
   border-radius: 24px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.1);
 }
 
 .glass-card::before {
@@ -112,6 +143,17 @@ body {
   border-color: var(--border-light);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
+}
+
+[data-theme="light"] .surface-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 16px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .surface-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.12);
 }
 
 /* Premium Button System */

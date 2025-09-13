@@ -24,10 +24,13 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen transition-colors duration-300 flex items-center justify-center" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
         <div className="text-center">
           <LoadingSpinner size="lg" />
-          <p className="text-white mt-4">Loading...</p>
+          <p className="text-primary mt-4">Loading...</p>
         </div>
       </div>
     );
@@ -39,9 +42,12 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
 
   if (requireAdmin && !user.isAdmin) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen transition-colors duration-300 flex items-center justify-center" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
         <div className="glass-card p-8 text-center">
-          <h2 className="text-xl font-semibold text-white mb-2">Access Denied</h2>
+          <h2 className="text-xl font-semibold text-primary mb-2">Access Denied</h2>
           <p className="text-secondary">You don't have permission to access this page.</p>
         </div>
       </div>

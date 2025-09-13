@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Users, UserPlus, BarChart3, TrendingUp, MapPin, Building2, Sparkles, ArrowRight } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Navbar from '@/components/Navbar';
 
 export default function HomePage() {
   const stats = [
@@ -27,8 +28,12 @@ export default function HomePage() {
 
   return (
     <ProtectedRoute>
-      <div className="app-background min-h-screen">
-      <div className="relative z-10">
+      <div className="min-h-screen transition-colors duration-300" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Simplified Hero */}
         <section className="text-center py-24 animate-fade-in-up">
           <h1 className="heading-xl mb-6">
@@ -60,7 +65,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-4">
                   <stat.icon className="w-8 h-8 text-primary" />
                   <div>
-                    <h3 className="text-2xl font-bold text-white">{stat.value}</h3>
+                    <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
                     <p className="text-secondary text-sm">{stat.label}</p>
                   </div>
                 </div>
@@ -91,14 +96,14 @@ export default function HomePage() {
                           className="w-4 h-4 rounded-full shadow-lg"
                           style={{ backgroundColor: city.color, boxShadow: `0 0 12px ${city.color}40` }}
                         ></div>
-                        <span className="font-semibold text-white text-lg">{city.city}</span>
+                        <span className="font-semibold text-primary text-lg">{city.city}</span>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-white text-lg">{city.buyers}</div>
+                        <div className="font-bold text-primary text-lg">{city.buyers}</div>
                         <div className="text-secondary text-sm">{city.percentage}%</div>
                       </div>
                     </div>
-                    <div className="w-full bg-surface-light rounded-full h-3 overflow-hidden">
+                    <div className="w-full bg-surface rounded-full h-3 overflow-hidden">
                       <div 
                         className="h-3 rounded-full transition-all duration-1000 ease-out"
                         style={{ 
@@ -120,7 +125,7 @@ export default function HomePage() {
               </h3>
               <div className="space-y-6">
                 {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl hover:bg-surface-light/50 transition-colors group">
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl hover:bg-surface/20 transition-colors group">
                     <div className={`w-3 h-3 rounded-full mt-2 shadow-lg ${
                       activity.type === 'new' ? 'bg-success shadow-emerald-500/50' :
                       activity.type === 'converted' ? 'bg-primary shadow-indigo-500/50' :
@@ -128,7 +133,7 @@ export default function HomePage() {
                       'bg-accent shadow-cyan-500/50'
                     }`}></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-medium mb-1">{activity.action}</p>
+                      <p className="text-primary font-medium mb-1">{activity.action}</p>
                       <p className="text-primary font-semibold mb-1">{activity.name}</p>
                       <p className="text-muted text-sm">{activity.time}</p>
                     </div>
@@ -150,7 +155,7 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
                 <Users className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Lead Management</h3>
+              <h3 className="text-xl font-bold text-primary mb-3">Lead Management</h3>
               <p className="text-secondary mb-6 leading-relaxed">
                 Centralize and streamline your buyer lead pipeline with advanced tracking.
               </p>
@@ -163,7 +168,7 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
                 <BarChart3 className="w-8 h-8 text-success" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Data Management</h3>
+              <h3 className="text-xl font-bold text-primary mb-3">Data Management</h3>
               <p className="text-secondary mb-6 leading-relaxed">
                 Import and export buyer data with CSV support for bulk operations.
               </p>

@@ -78,7 +78,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
       case 'lost':
         return 'bg-red-500/10 text-red-400 border-red-500/30';
       default:
-        return 'bg-gray-500/10 text-gray-400 border-gray-500/30';
+        return 'bg-gray-500/10 text-muted border-gray-500/30';
     }
   };
 
@@ -95,16 +95,16 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
   };
 
   return (
-    <div className="glass-card overflow-hidden rounded-2xl border border-white/10">
+    <div className="glass-card overflow-hidden rounded-2xl border border-border/20">
       {/* Table toolbar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-gradient-to-r from-slate-800/30 to-slate-700/30">
-        <div className="text-sm text-gray-300 font-medium">
-          <span className="text-white font-semibold">{buyers.length}</span> {buyers.length === 1 ? 'buyer' : 'buyers'}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border/20 bg-gradient-to-r from-slate-800/30 to-slate-700/30">
+        <div className="text-sm text-secondary font-medium">
+          <span className="text-primary font-semibold">{buyers.length}</span> {buyers.length === 1 ? 'buyer' : 'buyers'}
         </div>
         <button
           type="button"
           onClick={() => setDensity(isCompact ? 'comfortable' : 'compact')}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 text-indigo-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-500/20 hover:to-purple-500/20 transition-all duration-200 text-xs font-medium shadow-sm"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 text-indigo-300 hover:text-primary hover:bg-gradient-to-r hover:from-indigo-500/20 hover:to-purple-500/20 transition-all duration-200 text-xs font-medium shadow-sm"
           aria-label="Toggle density"
         >
           <div className="w-2 h-2 rounded-full bg-current"></div>
@@ -114,7 +114,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
       <div className="overflow-x-auto">
         <table className={`w-full ${tableTextClass}`}>
           <thead className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 backdrop-blur-sm">
-            <tr className="border-b border-white/10">
+            <tr className="border-b border-border/20">
               <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Buyer</th>
               <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Contact</th>
               <th className="text-left py-4 px-6 font-semibold text-gray-200 text-xs uppercase tracking-wider">Property</th>
@@ -133,29 +133,29 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
                       {buyer.fullName.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className={`font-semibold text-white truncate group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.fullName}</div>
-                      <div className="text-gray-400 text-xs truncate group-hover:text-gray-300 transition-colors duration-200">{buyer.city}</div>
+                      <div className={`font-semibold text-primary truncate group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.fullName}</div>
+                      <div className="text-muted text-xs truncate group-hover:text-secondary transition-colors duration-200">{buyer.city}</div>
                     </div>
                   </div>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
                   <div className="space-y-1">
-                    <div className={`text-white font-medium group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.phone}</div>
+                    <div className={`text-primary font-medium group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.phone}</div>
                     {buyer.email && (
-                      <div className="text-gray-400 text-xs truncate group-hover:text-gray-300 transition-colors duration-200">{buyer.email}</div>
+                      <div className="text-muted text-xs truncate group-hover:text-secondary transition-colors duration-200">{buyer.email}</div>
                     )}
                   </div>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
                   <div className="space-y-1">
-                    <div className={`text-white font-medium truncate group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.propertyType}</div>
-                    <div className="text-gray-400 text-xs truncate group-hover:text-gray-300 transition-colors duration-200">
+                    <div className={`text-primary font-medium truncate group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>{buyer.propertyType}</div>
+                    <div className="text-muted text-xs truncate group-hover:text-secondary transition-colors duration-200">
                       {buyer.bhk ? `${buyer.bhk} BHK` : 'Any'} • {buyer.purpose}
                     </div>
                   </div>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
-                  <div className={`text-white font-medium group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>
+                  <div className={`text-primary font-medium group-hover:text-indigo-100 transition-colors duration-200 ${isCompact ? 'text-sm' : 'text-base'}`}>
                     {buyer.budgetMin && buyer.budgetMax ? 
                       `${formatCurrency(buyer.budgetMin).replace(',00,000', 'L')} - ${formatCurrency(buyer.budgetMax).replace(',00,000', 'L')}` : 
                       formatCurrency(buyer.budgetMin || buyer.budgetMax)?.replace(',00,000', 'L')
@@ -169,7 +169,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
                   </span>
                 </td>
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
-                  <div className={`text-gray-400 font-medium group-hover:text-gray-300 transition-colors duration-200 ${isCompact ? 'text-xs' : 'text-sm'}`}>
+                  <div className={`text-muted font-medium group-hover:text-secondary transition-colors duration-200 ${isCompact ? 'text-xs' : 'text-sm'}`}>
                     {formatDate(buyer.createdAt).split(' ').map((part, i) => (
                       <div key={i}>{part}</div>
                     ))}
@@ -215,23 +215,23 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity z-50">
           <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div className="relative transform overflow-hidden rounded-2xl glass-card border border-white/10 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="relative transform overflow-hidden rounded-2xl glass-card border border-border/20 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                 <div className="p-6">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-500/20 sm:mx-0 sm:h-10 sm:w-10">
                       <Trash2 className="h-6 w-6 text-red-400" />
                     </div>
                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <h3 className="text-lg font-semibold text-white">Delete Lead</h3>
+                      <h3 className="text-lg font-semibold text-primary">Delete Lead</h3>
                       <div className="mt-2">
-                        <p className="text-sm text-gray-300">
-                          Are you sure you want to delete <span className="font-medium text-white">{showDeleteConfirm.buyerName}</span>? This action cannot be undone.
+                        <p className="text-sm text-secondary">
+                          Are you sure you want to delete <span className="font-medium text-primary">{showDeleteConfirm.buyerName}</span>? This action cannot be undone.
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="px-6 py-4 flex gap-3 justify-end border-t border-white/10">
+                <div className="px-6 py-4 flex gap-3 justify-end border-t border-border/20">
                   <button
                     type="button"
                     onClick={() => setShowDeleteConfirm(null)}
@@ -243,7 +243,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
                     type="button"
                     onClick={handleDelete}
                     disabled={deletingId === showDeleteConfirm.buyerId}
-                    className="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                    className="bg-red-600 hover:bg-red-500 text-primary px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
                   >
                     {deletingId === showDeleteConfirm.buyerId ? 'Deleting...' : 'Delete'}
                   </button>

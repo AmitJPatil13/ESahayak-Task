@@ -25,7 +25,7 @@ export default function LoadingBuyers() {
       </div>
 
       {/* Table skeleton */}
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+      <div className="bg-surface/20 backdrop-blur-sm rounded-xl p-4 border border-border/20">
         <SkeletonTable rows={6} columns={6} />
       </div>
 

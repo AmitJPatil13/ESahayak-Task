@@ -52,7 +52,7 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
     return (
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-          statusColors[status] || 'bg-gray-100 text-gray-800'
+          statusColors[status] || 'bg-gray-100 text-primary'
         }`}
       >
         {status}
@@ -102,13 +102,16 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen transition-colors duration-300" style={{
+        background: 'var(--background)',
+        backgroundImage: 'linear-gradient(135deg, var(--background) 0%, var(--background-secondary) 50%, var(--surface) 100%)'
+      }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
         <div className="mb-6">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200"
+            className="inline-flex items-center text-sm font-medium text-secondary hover:text-primary transition-colors duration-200"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Buyers
@@ -116,7 +119,7 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
         </div>
 
         {/* Header */}
-        <div className="glass-card rounded-2xl p-8 mb-8 border border-white/10">
+        <div className="glass-card rounded-2xl p-8 mb-8 border border-border/20">
           <div className="lg:flex lg:items-center lg:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-4 mb-4">
@@ -127,23 +130,23 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                   <h2 className="text-3xl font-bold gradient-text">
                     {buyer.fullName}
                   </h2>
-                  <p className="text-gray-300 text-lg">{getStatusBadge(buyer.status)}</p>
+                  <p className="text-secondary text-lg">{getStatusBadge(buyer.status)}</p>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-6">
-                <div className="flex items-center gap-2 text-sm text-gray-300">
+                <div className="flex items-center gap-2 text-sm text-secondary">
                   <Phone className="h-4 w-4 text-green-400" />
-                  <span className="text-white font-medium">{buyer.phone}</span>
+                  <span className="text-primary font-medium">{buyer.phone}</span>
                 </div>
                 {buyer.email && (
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <div className="flex items-center gap-2 text-sm text-secondary">
                     <Mail className="h-4 w-4 text-blue-400" />
-                    <span className="text-white font-medium">{buyer.email}</span>
+                    <span className="text-primary font-medium">{buyer.email}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-sm text-gray-300">
+                <div className="flex items-center gap-2 text-sm text-secondary">
                   <MapPin className="h-4 w-4 text-red-400" />
-                  <span className="text-white font-medium">{buyer.city}</span>
+                  <span className="text-primary font-medium">{buyer.city}</span>
                 </div>
               </div>
             </div>
@@ -171,34 +174,34 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Buyer Details */}
           <div className="lg:col-span-2">
-            <div className="glass-card rounded-2xl p-8 border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-6">Lead Details</h3>
+            <div className="glass-card rounded-2xl p-8 border border-border/20">
+              <h3 className="text-xl font-semibold text-primary mb-6">Lead Details</h3>
               <div className="space-y-6">
                 <dl className="space-y-4">
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Status</dt>
-                    <dd className="text-sm text-white">
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Status</dt>
+                    <dd className="text-sm text-primary">
                       {getStatusBadge(buyer.status)}
                     </dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Location</dt>
-                    <dd className="text-sm text-white font-medium">{buyer.city}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Location</dt>
+                    <dd className="text-sm text-primary font-medium">{buyer.city}</dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Property Type</dt>
-                    <dd className="text-sm text-white font-medium">
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Property Type</dt>
+                    <dd className="text-sm text-primary font-medium">
                       {buyer.propertyType}
                       {buyer.bhk && ` - ${buyer.bhk} BHK`}
                     </dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Purpose</dt>
-                    <dd className="text-sm text-white font-medium capitalize">{buyer.purpose}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Purpose</dt>
+                    <dd className="text-sm text-primary font-medium capitalize">{buyer.purpose}</dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Budget Range</dt>
-                    <dd className="text-sm text-white font-medium">
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Budget Range</dt>
+                    <dd className="text-sm text-primary font-medium">
                       {buyer.budgetMin || buyer.budgetMax ? (
                         <>
                           {formatCurrency(buyer.budgetMin)} - {formatCurrency(buyer.budgetMax)}
@@ -208,17 +211,17 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                       )}
                     </dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Timeline</dt>
-                    <dd className="text-sm text-white font-medium">{buyer.timeline}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Timeline</dt>
+                    <dd className="text-sm text-primary font-medium">{buyer.timeline}</dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Source</dt>
-                    <dd className="text-sm text-white font-medium">{buyer.source}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Source</dt>
+                    <dd className="text-sm text-primary font-medium">{buyer.source}</dd>
                   </div>
                   {buyer.tags && buyer.tags.length > 0 && (
-                    <div className="flex justify-between items-start py-3 border-b border-white/10">
-                      <dt className="text-sm font-medium text-gray-300">Tags</dt>
+                    <div className="flex justify-between items-start py-3 border-b border-border/20">
+                      <dt className="text-sm font-medium text-secondary">Tags</dt>
                       <dd className="text-sm">
                         <div className="flex flex-wrap gap-2">
                           {buyer.tags.map((tag: string) => (
@@ -234,20 +237,20 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                     </div>
                   )}
                   {buyer.notes && (
-                    <div className="flex justify-between items-start py-3 border-b border-white/10">
-                      <dt className="text-sm font-medium text-gray-300">Notes</dt>
-                      <dd className="text-sm text-white font-medium max-w-md">{buyer.notes}</dd>
+                    <div className="flex justify-between items-start py-3 border-b border-border/20">
+                      <dt className="text-sm font-medium text-secondary">Notes</dt>
+                      <dd className="text-sm text-primary font-medium max-w-md">{buyer.notes}</dd>
                     </div>
                   )}
-                  <div className="flex justify-between items-center py-3 border-b border-white/10">
-                    <dt className="text-sm font-medium text-gray-300">Created</dt>
-                    <dd className="text-sm text-white font-medium">
+                  <div className="flex justify-between items-center py-3 border-b border-border/20">
+                    <dt className="text-sm font-medium text-secondary">Created</dt>
+                    <dd className="text-sm text-primary font-medium">
                       {formatDate(buyer.createdAt)}
                     </dd>
                   </div>
                   <div className="flex justify-between items-center py-3">
-                    <dt className="text-sm font-medium text-gray-300">Last Updated</dt>
-                    <dd className="text-sm text-white font-medium">
+                    <dt className="text-sm font-medium text-secondary">Last Updated</dt>
+                    <dd className="text-sm text-primary font-medium">
                       {formatDate(buyer.updatedAt)}
                     </dd>
                   </div>
@@ -259,8 +262,8 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
 
         {/* History */}
         <div>
-          <div className="glass-card rounded-2xl p-8 border border-white/10">
-            <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
+          <div className="glass-card rounded-2xl p-8 border border-border/20">
+            <h3 className="text-xl font-semibold text-primary mb-6">Recent Activity</h3>
             <div className="mt-5">
               {history.length > 0 ? (
                 <div className="flow-root">
@@ -277,18 +280,18 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                           <div className="relative flex space-x-3">
                             <div>
                               <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                                <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                <svg className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
                                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.53 10.53a.75.75 0 00-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
                                 </svg>
                               </span>
                             </div>
                             <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                               <div>
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm text-muted">
                                   {renderHistoryDiff(entry.diff)}
                                 </div>
                               </div>
-                              <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                              <div className="whitespace-nowrap text-right text-sm text-muted">
                                 {formatDate(entry.changedAt)}
                               </div>
                             </div>
@@ -299,7 +302,7 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                   </ul>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No activity recorded yet.</p>
+                <p className="text-sm text-muted">No activity recorded yet.</p>
               )}
             </div>
           </div>
@@ -310,23 +313,23 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity z-50">
           <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div className="relative transform overflow-hidden rounded-2xl glass-card border border-white/10 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="relative transform overflow-hidden rounded-2xl glass-card border border-border/20 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                 <div className="p-6">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-500/20 sm:mx-0 sm:h-10 sm:w-10">
                       <Trash2 className="h-6 w-6 text-red-400" />
                     </div>
                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <h3 className="text-lg font-semibold text-white">Delete Lead</h3>
+                      <h3 className="text-lg font-semibold text-primary">Delete Lead</h3>
                       <div className="mt-2">
-                        <p className="text-sm text-gray-300">
+                        <p className="text-sm text-secondary">
                           Are you sure you want to delete this lead? This action cannot be undone.
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="px-6 py-4 flex gap-3 justify-end border-t border-white/10">
+                <div className="px-6 py-4 flex gap-3 justify-end border-t border-border/20">
                   <button
                     type="button"
                     onClick={() => setShowDeleteConfirm(false)}
@@ -338,7 +341,7 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                     type="button"
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                    className="bg-red-600 hover:bg-red-500 text-primary px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
                   </button>
