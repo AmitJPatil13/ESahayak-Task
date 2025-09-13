@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Users, UserPlus, BarChart3, TrendingUp, MapPin, Building2, Sparkles, ArrowRight } from 'lucide-react';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function HomePage() {
   const stats = [
@@ -25,7 +26,8 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="app-background min-h-screen">
+    <ProtectedRoute>
+      <div className="app-background min-h-screen">
       <div className="relative z-10">
         {/* Premium Header */}
         <header className="glass-card mx-8 mt-8 mb-12 animate-fade-in-up">
@@ -208,5 +210,6 @@ export default function HomePage() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

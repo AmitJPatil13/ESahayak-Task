@@ -6,6 +6,7 @@ import { mockApi } from '@/lib/mockApi';
 import { BuyerFiltersType } from '@/lib/zod-schemas';
 import BackButton from '@/components/BackButton';
 import { Download, FileText, Filter } from 'lucide-react';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function ExportPage() {
   const router = useRouter();
@@ -42,11 +43,12 @@ export default function ExportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <BackButton href="/buyers" label="Back to Buyers" />
-        </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6">
+            <BackButton href="/buyers" label="Back to Buyers" />
+          </div>
 
         <div className="glass-card rounded-2xl p-8">
           <div className="text-center mb-8">
@@ -137,5 +139,6 @@ export default function ExportPage() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

@@ -70,11 +70,12 @@ export default function BuyerFilters() {
           </label>
           <input
             type="text"
-            id="search"
+            id="buyer-search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, email, or phone..."
             className="premium-input w-full"
+            aria-label="Search buyers (Press / to focus)"
           />
         </div>
 

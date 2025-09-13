@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { mockApi } from '@/lib/mockApi';
 import BackButton from '@/components/BackButton';
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface ImportResult {
   inserted: number;
@@ -75,17 +76,11 @@ Jane Smith,jane@example.com,9876543211,Mohali,Villa,4,Buy,8000000,12000000,3-6m,
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <BackButton href="/buyers" label="Back to Buyers" />
-        </div>
-
-        <div className="glass-card rounded-2xl p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-8 h-8 text-primary" />
-            </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6">
+            <BackButton href="/buyers" label="Back to Buyers" />
             <h1 className="text-3xl font-bold text-white mb-2">Import Buyer Data</h1>
             <p className="text-secondary">Upload CSV file to import buyer leads (max 200 rows)</p>
           </div>
@@ -194,6 +189,6 @@ Jane Smith,jane@example.com,9876543211,Mohali,Villa,4,Buy,8000000,12000000,3-6m,
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

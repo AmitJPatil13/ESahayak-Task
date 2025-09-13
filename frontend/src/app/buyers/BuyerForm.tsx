@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BuyerCreate, BuyerCreateType, City, PropertyType, BHK, Purpose, Timeline, Source, Status } from '@/lib/zod-schemas';
 import { mockApi } from '@/lib/mockApi';
+import { BuyerCreateType } from '@/lib/zod-schemas';
+import LoadingButton from '@/components/LoadingButton';
+import { BuyerCreate, City, PropertyType, BHK, Purpose, Timeline, Source, Status } from '@/lib/zod-schemas';
 
 interface BuyerFormProps {
   initialData?: Partial<BuyerCreateType>;
@@ -85,17 +87,17 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
   };
 
   const handleInputChange = (field: keyof BuyerCreateType, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: Partial<BuyerCreateType>) => ({ ...prev, [field]: value }));
     
     // Clear error for this field
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+    if (errors[field as string]) {
+      setErrors((prev: Record<string, string>) => ({ ...prev, [field as string]: '' }));
     }
 
     // Handle BHK requirement logic
     if (field === 'propertyType') {
       if (!['Apartment', 'Villa'].includes(value)) {
-        setFormData(prev => ({ ...prev, bhk: undefined }));
+        setFormData((prev: Partial<BuyerCreateType>) => ({ ...prev, bhk: undefined }));
       }
     }
   };
@@ -486,13 +488,15 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
             >
               Cancel
             </button>
-            <button
+            <LoadingButton
               type="submit"
-              disabled={isSubmitting}
-              className="btn-primary px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              loading={isSubmitting}
+              variant="primary"
+              size="lg"
+              className="px-8 py-4"
             >
-              {isSubmitting ? 'Saving...' : isEdit ? 'Update Buyer Lead' : 'Create Buyer Lead'}
-            </button>
+              {isEdit ? 'Update Buyer' : 'Create Buyer'}
+            </LoadingButton>
           </div>
         </form>
       </div>
