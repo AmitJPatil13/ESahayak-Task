@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { BuyerType, BuyerHistoryType } from '@/lib/zod-schemas';
 import { mockApi } from '@/lib/mockApi';
-import { useRouter } from 'next/navigation';
+import { useToast } from '@/contexts/ToastContext';
+import { Trash2, Edit, ArrowLeft, Phone, Mail, MapPin, Calendar, DollarSign, Home, User } from 'lucide-react';
 
 interface BuyerDetailsProps {
   buyer: BuyerType;
@@ -13,6 +15,7 @@ interface BuyerDetailsProps {
 
 export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -60,11 +63,23 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
+      console.log('Deleting buyer with ID:', buyer.id);
       await mockApi.deleteBuyer(buyer.id);
+      showSuccess('Buyer Deleted', `${buyer.fullName} has been successfully deleted.`);
+      setShowDeleteConfirm(false);
       router.push('/buyers');
     } catch (error) {
       console.error('Error deleting buyer:', error);
-      setIsDeleting(false);
+      if (error instanceof Error && error.message.includes('Buyer not found')) {
+        // Buyer was already deleted, just redirect
+        console.log('Buyer already deleted, redirecting...');
+        setShowDeleteConfirm(false);
+        router.push('/buyers');
+      } else {
+        showError('Delete Failed', 'Failed to delete buyer. Please try again.');
+        setIsDeleting(false);
+        setShowDeleteConfirm(false);
+      }
     }
   };
 
@@ -87,81 +102,103 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="md:flex md:items-center md:justify-between">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            {buyer.fullName}
-          </h2>
-          <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-            <div className="mt-2 flex items-center text-sm text-gray-500">
-              <svg className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 012.43 8.326 13.019 13.019 0 012 5V3.5z" clipRule="evenodd" />
-              </svg>
-              {buyer.phone}
-            </div>
-            {buyer.email && (
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <svg className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
-                  <path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
-                </svg>
-                {buyer.email}
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="mt-4 flex md:ml-4 md:mt-0">
-          <Link
-            href={`/buyers/${buyer.id}/edit`}
-            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            Edit
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back button */}
+        <div className="mb-6">
           <button
-            type="button"
-            onClick={() => setShowDeleteConfirm(true)}
-            className="ml-3 inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+            onClick={() => router.back()}
+            className="inline-flex items-center text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200"
           >
-            Delete
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Buyers
           </button>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Buyer Details */}
-        <div className="lg:col-span-2">
-          <div className="bg-white shadow sm:rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-base font-semibold leading-6 text-gray-900">Lead Details</h3>
-              <div className="mt-5 border-t border-gray-200">
-                <dl className="divide-y divide-gray-200">
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Status</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+        {/* Header */}
+        <div className="glass-card rounded-2xl p-8 mb-8 border border-white/10">
+          <div className="lg:flex lg:items-center lg:justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                  <User className="w-8 h-8 text-indigo-400" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold gradient-text">
+                    {buyer.fullName}
+                  </h2>
+                  <p className="text-gray-300 text-lg">{getStatusBadge(buyer.status)}</p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-6">
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <Phone className="h-4 w-4 text-green-400" />
+                  <span className="text-white font-medium">{buyer.phone}</span>
+                </div>
+                {buyer.email && (
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <Mail className="h-4 w-4 text-blue-400" />
+                    <span className="text-white font-medium">{buyer.email}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <MapPin className="h-4 w-4 text-red-400" />
+                  <span className="text-white font-medium">{buyer.city}</span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 lg:mt-0 flex gap-3">
+              <Link
+                href={`/buyers/${buyer.id}/edit`}
+                className="btn-secondary flex items-center gap-2 px-6 py-3"
+              >
+                <Edit className="w-4 h-4" />
+                Edit Lead
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="btn-outline border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-400/50 flex items-center gap-2 px-6 py-3"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Buyer Details */}
+          <div className="lg:col-span-2">
+            <div className="glass-card rounded-2xl p-8 border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-6">Lead Details</h3>
+              <div className="space-y-6">
+                <dl className="space-y-4">
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Status</dt>
+                    <dd className="text-sm text-white">
                       {getStatusBadge(buyer.status)}
                     </dd>
                   </div>
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Location</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{buyer.city}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Location</dt>
+                    <dd className="text-sm text-white font-medium">{buyer.city}</dd>
                   </div>
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Property Type</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Property Type</dt>
+                    <dd className="text-sm text-white font-medium">
                       {buyer.propertyType}
                       {buyer.bhk && ` - ${buyer.bhk} BHK`}
                     </dd>
                   </div>
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Purpose</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 capitalize">{buyer.purpose}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Purpose</dt>
+                    <dd className="text-sm text-white font-medium capitalize">{buyer.purpose}</dd>
                   </div>
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Budget Range</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Budget Range</dt>
+                    <dd className="text-sm text-white font-medium">
                       {buyer.budgetMin || buyer.budgetMax ? (
                         <>
                           {formatCurrency(buyer.budgetMin)} - {formatCurrency(buyer.budgetMax)}
@@ -171,23 +208,23 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                       )}
                     </dd>
                   </div>
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Timeline</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{buyer.timeline}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Timeline</dt>
+                    <dd className="text-sm text-white font-medium">{buyer.timeline}</dd>
                   </div>
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Source</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{buyer.source}</dd>
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Source</dt>
+                    <dd className="text-sm text-white font-medium">{buyer.source}</dd>
                   </div>
                   {buyer.tags && buyer.tags.length > 0 && (
-                    <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                      <dt className="text-sm font-medium text-gray-500">Tags</dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                        <div className="flex flex-wrap gap-1">
+                    <div className="flex justify-between items-start py-3 border-b border-white/10">
+                      <dt className="text-sm font-medium text-gray-300">Tags</dt>
+                      <dd className="text-sm">
+                        <div className="flex flex-wrap gap-2">
                           {buyer.tags.map((tag: string) => (
                             <span
                               key={tag}
-                              className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700"
+                              className="inline-flex items-center rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-300 border border-blue-400/30"
                             >
                               {tag}
                             </span>
@@ -197,20 +234,20 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                     </div>
                   )}
                   {buyer.notes && (
-                    <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                      <dt className="text-sm font-medium text-gray-500">Notes</dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{buyer.notes}</dd>
+                    <div className="flex justify-between items-start py-3 border-b border-white/10">
+                      <dt className="text-sm font-medium text-gray-300">Notes</dt>
+                      <dd className="text-sm text-white font-medium max-w-md">{buyer.notes}</dd>
                     </div>
                   )}
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Created</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  <div className="flex justify-between items-center py-3 border-b border-white/10">
+                    <dt className="text-sm font-medium text-gray-300">Created</dt>
+                    <dd className="text-sm text-white font-medium">
                       {formatDate(buyer.createdAt)}
                     </dd>
                   </div>
-                  <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
-                    <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  <div className="flex justify-between items-center py-3">
+                    <dt className="text-sm font-medium text-gray-300">Last Updated</dt>
+                    <dd className="text-sm text-white font-medium">
                       {formatDate(buyer.updatedAt)}
                     </dd>
                   </div>
@@ -222,93 +259,88 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
 
         {/* History */}
         <div>
-          <div className="bg-white shadow sm:rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-base font-semibold leading-6 text-gray-900">Recent Activity</h3>
-              <div className="mt-5">
-                {history.length > 0 ? (
-                  <div className="flow-root">
-                    <ul className="-mb-8">
-                      {history.map((entry, entryIdx) => (
-                        <li key={entry.id}>
-                          <div className="relative pb-8">
-                            {entryIdx !== history.length - 1 ? (
-                              <span
-                                className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
-                                aria-hidden="true"
-                              />
-                            ) : null}
-                            <div className="relative flex space-x-3">
+          <div className="glass-card rounded-2xl p-8 border border-white/10">
+            <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
+            <div className="mt-5">
+              {history.length > 0 ? (
+                <div className="flow-root">
+                  <ul className="-mb-8">
+                    {history.map((entry, entryIdx) => (
+                      <li key={entry.id}>
+                        <div className="relative pb-8">
+                          {entryIdx !== history.length - 1 ? (
+                            <span
+                              className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                          <div className="relative flex space-x-3">
+                            <div>
+                              <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                                <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.53 10.53a.75.75 0 00-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                                </svg>
+                              </span>
+                            </div>
+                            <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                               <div>
-                                <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                                  <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.53 10.53a.75.75 0 00-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                                  </svg>
-                                </span>
+                                <div className="text-sm text-gray-500">
+                                  {renderHistoryDiff(entry.diff)}
+                                </div>
                               </div>
-                              <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                <div>
-                                  <div className="text-sm text-gray-500">
-                                    {renderHistoryDiff(entry.diff)}
-                                  </div>
-                                </div>
-                                <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                                  {formatDate(entry.changedAt)}
-                                </div>
+                              <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                                {formatDate(entry.changedAt)}
                               </div>
                             </div>
                           </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500">No activity recorded yet.</p>
-                )}
-              </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">No activity recorded yet.</p>
+              )}
             </div>
           </div>
         </div>
       </div>
-
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-50">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity z-50">
           <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+              <div className="relative transform overflow-hidden rounded-2xl glass-card border border-white/10 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div className="p-6">
                   <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                      <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                      </svg>
+                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                      <Trash2 className="h-6 w-6 text-red-400" />
                     </div>
                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                      <h3 className="text-base font-semibold leading-6 text-gray-900">Delete Lead</h3>
+                      <h3 className="text-lg font-semibold text-white">Delete Lead</h3>
                       <div className="mt-2">
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-300">
                           Are you sure you want to delete this lead? This action cannot be undone.
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <div className="px-6 py-4 flex gap-3 justify-end border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="btn-outline px-6 py-2"
+                  >
+                    Cancel
+                  </button>
                   <button
                     type="button"
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto disabled:opacity-50"
+                    className="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowDeleteConfirm(false)}
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                  >
-                    Cancel
                   </button>
                 </div>
               </div>

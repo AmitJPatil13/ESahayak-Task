@@ -300,7 +300,9 @@ export const mockApi = {
     
     const buyerIndex = mockBuyers.findIndex(b => b.id === id);
     if (buyerIndex === -1) {
-      throw new Error('Buyer not found');
+      // Buyer already deleted or doesn't exist - this is fine for idempotent operations
+      console.log(`Buyer with ID ${id} already deleted or doesn't exist`);
+      return;
     }
     
     mockBuyers.splice(buyerIndex, 1);

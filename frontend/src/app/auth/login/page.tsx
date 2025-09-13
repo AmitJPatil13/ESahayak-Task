@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/lib/mockApi';
-import { LogIn, User } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
+import { LogIn, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
+  const { showSuccess, showError } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDemoLogin = async () => {
@@ -21,7 +24,7 @@ export default function LoginPage() {
       router.push('/');
     } catch (error) {
       console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
+      showError('Login Failed', 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

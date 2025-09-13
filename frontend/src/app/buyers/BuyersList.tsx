@@ -41,16 +41,16 @@ export default async function BuyersList({ filters }: BuyersListProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <BuyersTable buyers={response.items} />
-      </div>
+    <div className="space-y-8">
+      <BuyersTable buyers={response.items} />
       
-      <Pagination
-        currentPage={response.page}
-        pageSize={response.pageSize}
-        total={response.total}
-      />
+      <div className="flex justify-center">
+        <Pagination
+          currentPage={response.page}
+          pageSize={response.pageSize}
+          total={response.total}
+        />
+      </div>
     </div>
   );
 }
