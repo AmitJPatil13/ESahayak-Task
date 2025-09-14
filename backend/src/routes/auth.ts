@@ -1,10 +1,9 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { z } from 'zod';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 const DemoLoginSchema = z.object({
   email: z.string().email(),

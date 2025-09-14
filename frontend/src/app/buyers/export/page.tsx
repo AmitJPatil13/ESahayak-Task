@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
 import { BuyerFiltersType } from '@/lib/zod-schemas';
 import { Download, FileText, Filter } from 'lucide-react';
@@ -17,7 +17,7 @@ export default function ExportPage() {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const csvData = await mockApi.exportBuyers(filters);
+      const csvData = await apiClient.exportBuyers(filters);
       
       // Create and download file
       const blob = new Blob([csvData], { type: 'text/csv' });
@@ -31,7 +31,7 @@ export default function ExportPage() {
       window.URL.revokeObjectURL(url);
       
       // Get count for feedback
-      const result = await mockApi.getBuyers(filters);
+      const result = await apiClient.getBuyers(filters);
       setExportCount(result.total);
       showSuccess('Export Successful', `Successfully exported ${result.total} buyers to CSV file.`);
       

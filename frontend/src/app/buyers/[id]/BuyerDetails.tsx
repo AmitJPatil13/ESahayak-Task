@@ -1,12 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { 
+  ArrowLeft, 
+  Edit, 
+  Trash2, 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Calendar,
+  DollarSign,
+  Home,
+  Target,
+  Clock,
+  Tag,
+  User,
+  Building
+} from 'lucide-react';
+import { apiClient } from '@/lib/api';
 import { BuyerType, BuyerHistoryType } from '@/lib/zod-schemas';
-import { mockApi } from '@/lib/mockApi';
-import { useToast } from '@/contexts/ToastContext';
-import { Trash2, Edit, ArrowLeft, Phone, Mail, MapPin, Calendar, DollarSign, Home, User } from 'lucide-react';
+import BuyerForm from '../BuyerForm';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 interface BuyerDetailsProps {
   buyer: BuyerType;
@@ -15,8 +31,8 @@ interface BuyerDetailsProps {
 
 export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
   const router = useRouter();
-  const { showSuccess, showError } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { notifyBuyerUpdate, notifyBuyerDelete } = useWebSocket();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const formatCurrency = (amount: number | undefined) => {
@@ -64,22 +80,14 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
     setIsDeleting(true);
     try {
       console.log('Deleting buyer with ID:', buyer.id);
-      await mockApi.deleteBuyer(buyer.id);
-      showSuccess('Buyer Deleted', `${buyer.fullName} has been successfully deleted.`);
-      setShowDeleteConfirm(false);
+      await apiClient.deleteBuyer(buyer.id);
+      notifyBuyerDelete('buyer-deleted');
       router.push('/buyers');
     } catch (error) {
       console.error('Error deleting buyer:', error);
-      if (error instanceof Error && error.message.includes('Buyer not found')) {
-        // Buyer was already deleted, just redirect
-        console.log('Buyer already deleted, redirecting...');
-        setShowDeleteConfirm(false);
-        router.push('/buyers');
-      } else {
-        showError('Delete Failed', 'Failed to delete buyer. Please try again.');
-        setIsDeleting(false);
-        setShowDeleteConfirm(false);
-      }
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -219,12 +227,12 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
                     <dt className="text-sm font-medium text-secondary">Source</dt>
                     <dd className="text-sm text-primary font-medium">{buyer.source}</dd>
                   </div>
-                  {buyer.tags && buyer.tags.length > 0 && (
+                  {buyer.tags && Array.isArray(buyer.tags) && buyer.tags.length > 0 && (
                     <div className="flex justify-between items-start py-3 border-b border-border/20">
                       <dt className="text-sm font-medium text-secondary">Tags</dt>
                       <dd className="text-sm">
                         <div className="flex flex-wrap gap-2">
-                          {buyer.tags.map((tag: string) => (
+                          {buyer.tags?.map((tag: string) => (
                             <span
                               key={tag}
                               className="inline-flex items-center rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-300 border border-blue-400/30"
@@ -265,13 +273,13 @@ export default function BuyerDetails({ buyer, history }: BuyerDetailsProps) {
           <div className="glass-card rounded-2xl p-8 border border-border/20">
             <h3 className="text-xl font-semibold text-primary mb-6">Recent Activity</h3>
             <div className="mt-5">
-              {history.length > 0 ? (
+              {history && Array.isArray(history) && history.length > 0 ? (
                 <div className="flow-root">
                   <ul className="-mb-8">
-                    {history.map((entry, entryIdx) => (
+                    {history?.map((entry, entryIdx) => (
                       <li key={entry.id}>
                         <div className="relative pb-8">
-                          {entryIdx !== history.length - 1 ? (
+                          {entryIdx !== (history?.length || 0) - 1 ? (
                             <span
                               className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
                               aria-hidden="true"

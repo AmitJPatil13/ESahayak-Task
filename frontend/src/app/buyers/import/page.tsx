@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
 import { Upload, Download, FileText, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -30,7 +30,7 @@ export default function ImportPage() {
     setResult(null);
     try {
       const csvContent = await file.text();
-      const importResult = await mockApi.importBuyers(csvContent);
+      const importResult = await apiClient.importBuyers(csvContent);
       setResult(importResult);
       if (importResult.inserted > 0) {
         showSuccess('Import Successful', `Successfully imported ${importResult.inserted} buyers`);

@@ -18,7 +18,7 @@ async function main() {
 
   console.log('✅ Demo user created:', demoUser.email);
 
-  // Create sample buyers
+  // Create sample buyers with proper schema validation
   const sampleBuyers = [
     {
       fullName: 'Rajesh Kumar',
@@ -26,7 +26,7 @@ async function main() {
       phone: '9876543210',
       city: 'Chandigarh' as const,
       propertyType: 'Apartment' as const,
-      bhk: '2' as const,
+      bhk: '2' as const, // Required for Apartment
       purpose: 'Buy' as const,
       budgetMin: 5000000,
       budgetMax: 7000000,
@@ -43,7 +43,7 @@ async function main() {
       phone: '9876543211',
       city: 'Mohali' as const,
       propertyType: 'Villa' as const,
-      bhk: '3' as const,
+      bhk: '3' as const, // Required for Villa
       purpose: 'Buy' as const,
       budgetMin: 8000000,
       budgetMax: 12000000,
@@ -56,9 +56,11 @@ async function main() {
     },
     {
       fullName: 'Amit Singh',
+      email: undefined, // Plot doesn't require email but schema allows optional
       phone: '9876543212',
       city: 'Zirakpur' as const,
       propertyType: 'Plot' as const,
+      bhk: undefined, // Plot doesn't have BHK
       purpose: 'Buy' as const,
       budgetMin: 3000000,
       budgetMax: 5000000,
@@ -75,6 +77,7 @@ async function main() {
       phone: '9876543213',
       city: 'Panchkula' as const,
       propertyType: 'Office' as const,
+      bhk: undefined, // Office doesn't have BHK
       purpose: 'Rent' as const,
       budgetMin: 50000,
       budgetMax: 80000,
@@ -91,6 +94,7 @@ async function main() {
       phone: '9876543214',
       city: 'Other' as const,
       propertyType: 'Retail' as const,
+      bhk: undefined, // Retail doesn't have BHK
       purpose: 'Rent' as const,
       budgetMin: 100000,
       budgetMax: 150000,

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserType } from '@/lib/zod-schemas';
+import { apiClient } from '@/lib/api';
 
 interface AuthContextType {
   user: UserType | null;
@@ -42,26 +43,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     
     try {
-      // Use real API for authentication
-      const response = await fetch('/api/auth/demo-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const { user, token } = await response.json();
-        setUser(user);
-        localStorage.setItem('esahayak_user', JSON.stringify(user));
-        localStorage.setItem('auth_token', token);
-        setIsLoading(false);
-        return true;
-      } else {
-        setIsLoading(false);
-        return false;
-      }
+      // Use real backend API for authentication
+      const response = await apiClient.demoLogin(email, password);
+      setUser(response.user);
+      localStorage.setItem('esahayak_user', JSON.stringify(response.user));
+      setIsLoading(false);
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       setIsLoading(false);
