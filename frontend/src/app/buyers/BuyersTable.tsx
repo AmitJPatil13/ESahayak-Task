@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { BuyerType } from '@/lib/zod-schemas';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
 import { Trash2, Eye, Edit } from 'lucide-react';
 
@@ -32,7 +32,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
     const {buyerId, buyerName} = showDeleteConfirm;
     setDeletingId(buyerId);
     try {
-      await mockApi.deleteBuyer(buyerId);
+      await apiClient.deleteBuyer(buyerId);
       showSuccess('Buyer Deleted', `${buyerName} has been successfully deleted.`);
       onBuyerDeleted?.();
       setShowDeleteConfirm(null);
@@ -99,7 +99,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
       {/* Table toolbar */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border/20 bg-gradient-to-r from-slate-800/30 to-slate-700/30">
         <div className="text-sm text-secondary font-medium">
-          <span className="text-primary font-semibold">{buyers.length}</span> {buyers.length === 1 ? 'buyer' : 'buyers'}
+          <span className="text-primary font-semibold">{buyers?.length || 0}</span> {(buyers?.length || 0) === 1 ? 'buyer' : 'buyers'}
         </div>
         <button
           type="button"
@@ -125,7 +125,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
             </tr>
           </thead>
           <tbody>
-            {buyers.map((buyer) => (
+            {buyers && Array.isArray(buyers) ? buyers.map((buyer) => (
               <tr key={buyer.id} className="group hover:bg-gradient-to-r hover:from-white/5 hover:to-indigo-500/5 border-b border-white/5 transition-all duration-300 hover:shadow-sm">
                 <td className={`${isCompact ? 'py-3' : 'py-4'} px-6`}>
                   <div className="flex items-center gap-4">
@@ -205,7 +205,7 @@ export default function BuyersTable({ buyers, onBuyerDeleted }: BuyersTableProps
                   </div>
                 </td>
               </tr>
-            ))}
+            )) : null}
           </tbody>
         </table>
       </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { BuyerType } from '@/lib/zod-schemas';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
@@ -33,7 +33,7 @@ export default function BuyersTableClient({ buyers }: BuyersTableClientProps) {
     const {buyerId, buyerName} = showDeleteConfirm;
     setDeletingId(buyerId);
     try {
-      await mockApi.deleteBuyer(buyerId);
+      await apiClient.deleteBuyer(buyerId);
       showSuccess('Buyer Deleted', `${buyerName} has been successfully deleted.`);
       
       // Update local state immediately for instant UI feedback
@@ -116,7 +116,7 @@ export default function BuyersTableClient({ buyers }: BuyersTableClientProps) {
       <div className="px-6 py-4 border-b border-border/20 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-primary">Buyer Leads</h3>
-          <p className="text-sm text-muted mt-1">{localBuyers.length} leads found</p>
+          <p className="text-sm text-muted mt-1">{localBuyers?.length || 0} leads found</p>
         </div>
         
         <div className="flex items-center gap-3">

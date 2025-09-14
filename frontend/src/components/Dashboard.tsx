@@ -5,16 +5,16 @@ import {
   Users, 
   TrendingUp, 
   DollarSign, 
-  Clock, 
+  Activity, 
   MapPin, 
-  Phone,
-  Mail,
-  Calendar,
   BarChart3,
   PieChart,
-  Activity
+  Clock,
+  Phone,
+  Mail
 } from 'lucide-react';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 interface DashboardStats {
   totalBuyers: number;
@@ -49,24 +49,26 @@ export default function Dashboard() {
   const [cityStats, setCityStats] = useState<CityStats[]>([]);
   const [statusStats, setStatusStats] = useState<StatusStats[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Real-time WebSocket connection
+  const { isConnected } = useWebSocket();
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await mockApi.getBuyers({ page: 1, pageSize: 1000 });
-        const buyers = response.items;
+  const fetchDashboardData = async () => {
+    try {
+      const response = await apiClient.getBuyers({ page: 1, pageSize: 1000 });
+      const buyers = response.items;
 
         // Calculate stats
-        const totalBuyers = buyers.length;
-        const activeBuyers = buyers.filter(b => b.status === 'active').length;
-        const totalValue = buyers.reduce((sum, b) => sum + (b.budget || 0), 0);
+        const totalBuyers = buyers?.length || 0;
+        const activeBuyers = buyers?.filter((b: any) => ['Qualified', 'Contacted', 'Visited', 'Negotiation'].includes(b.status))?.length || 0;
+        const totalValue = buyers?.reduce((sum: number, b: any) => sum + (b.budgetMax || 0), 0) || 0;
         const avgBudget = totalValue / totalBuyers || 0;
-        const recentActivity = buyers.filter(b => {
+        const recentActivity = buyers?.filter((b: any) => {
           const createdDate = new Date(b.createdAt);
           const weekAgo = new Date();
           weekAgo.setDate(weekAgo.getDate() - 7);
           return createdDate > weekAgo;
-        }).length;
+        })?.length || 0;
         const conversionRate = (activeBuyers / totalBuyers) * 100 || 0;
 
         setStats({
@@ -78,45 +80,43 @@ export default function Dashboard() {
           conversionRate
         });
 
-        // City distribution
-        const cityCount: { [key: string]: number } = {};
-        buyers.forEach(buyer => {
-          const city = buyer.city || 'Unknown';
-          cityCount[city] = (cityCount[city] || 0) + 1;
-        });
+        // Calculate city distribution
+        const cityDistribution = buyers?.reduce((acc: Record<string, number>, buyer: any) => {
+          acc[buyer.city] = (acc[buyer.city] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>) || {};
 
-        const cityData = Object.entries(cityCount)
-          .map(([city, count]) => ({
-            city,
-            count,
-            percentage: (count / totalBuyers) * 100
-          }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
+        const cityStatsData = Object.entries(cityDistribution).map(([city, count]) => ({
+          city,
+          count: count as number,
+          percentage: (count as number / totalBuyers) * 100
+        }));
 
-        setCityStats(cityData);
+        setCityStats(cityStatsData);
 
-        // Status distribution
-        const statusCount: { [key: string]: number } = {};
-        buyers.forEach(buyer => {
-          const status = buyer.status || 'unknown';
-          statusCount[status] = (statusCount[status] || 0) + 1;
-        });
+        // Calculate status distribution
+        const statusDistribution = buyers?.reduce((acc: Record<string, number>, buyer: any) => {
+          acc[buyer.status] = (acc[buyer.status] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>) || {};
 
         const statusColors: { [key: string]: string } = {
-          active: 'bg-green-500',
-          inactive: 'bg-gray-500',
-          pending: 'bg-yellow-500',
-          converted: 'bg-blue-500'
+          New: 'bg-blue-500',
+          Qualified: 'bg-green-500',
+          Contacted: 'bg-yellow-500',
+          Visited: 'bg-purple-500',
+          Negotiation: 'bg-orange-500',
+          Converted: 'bg-emerald-500',
+          Dropped: 'bg-red-500'
         };
 
-        const statusData = Object.entries(statusCount).map(([status, count]) => ({
+        const statusStatsData = Object.entries(statusDistribution).map(([status, count]) => ({
           status: status.charAt(0).toUpperCase() + status.slice(1),
-          count,
+          count: count as number,
           color: statusColors[status] || 'bg-gray-400'
         }));
 
-        setStatusStats(statusData);
+        setStatusStats(statusStatsData);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -124,7 +124,22 @@ export default function Dashboard() {
       }
     };
 
+  useEffect(() => {
     fetchDashboardData();
+  }, []);
+
+  // Listen for real-time updates
+  useEffect(() => {
+    const handleDashboardRefresh = () => {
+      console.log('🔄 Dashboard real-time update received, refreshing data...');
+      fetchDashboardData();
+    };
+
+    window.addEventListener('buyer:refresh', handleDashboardRefresh);
+    
+    return () => {
+      window.removeEventListener('buyer:refresh', handleDashboardRefresh);
+    };
   }, []);
 
   if (loading) {

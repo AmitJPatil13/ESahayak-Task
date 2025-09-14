@@ -1,5 +1,7 @@
 // Real API client to replace mock data
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+import { BuyerType, BuyerCreateType, BuyerUpdateType, BuyerFiltersType, BuyerListResponseType, UserType, BuyerHistoryType } from './zod-schemas';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 class ApiClient {
   private token: string | null = null;
@@ -33,7 +35,7 @@ class ApiClient {
   }
 
   // Auth
-  async demoLogin(email: string, password: string) {
+  async demoLogin(email: string, password: string): Promise<{ user: UserType; token: string }> {
     const response = await this.request('/auth/demo-login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
@@ -48,20 +50,10 @@ class ApiClient {
   }
 
   // Buyers
-  async getBuyers(params: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    city?: string;
-    propertyType?: string;
-    status?: string;
-    timeline?: string;
-    sortBy?: string;
-    sortOrder?: string;
-  } = {}) {
+  async getBuyers(filters: BuyerFiltersType = {}): Promise<BuyerListResponseType> {
     const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== '') {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== '' && value !== null) {
         searchParams.append(key, value.toString());
       }
     });
@@ -69,47 +61,41 @@ class ApiClient {
     return this.request(`/buyers?${searchParams}`);
   }
 
-  async getBuyer(id: string) {
+  async getBuyer(id: string): Promise<{ buyer: BuyerType; history: BuyerHistoryType[] } | null> {
     return this.request(`/buyers/${id}`);
   }
 
-  async createBuyer(data: any) {
+  async createBuyer(data: BuyerCreateType): Promise<BuyerType> {
     return this.request('/buyers', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateBuyer(id: string, data: any) {
+  async updateBuyer(id: string, data: BuyerUpdateType): Promise<BuyerType> {
     return this.request(`/buyers/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteBuyer(id: string) {
+  async deleteBuyer(id: string): Promise<void> {
     return this.request(`/buyers/${id}`, {
       method: 'DELETE',
     });
   }
 
-  async importBuyers(file: File) {
-    const formData = new FormData();
-    formData.append('file', file);
-
+  async importBuyers(csvData: string): Promise<{ inserted: number; errors: Array<{ row: number; message: string }> }> {
     return this.request('/buyers/import', {
       method: 'POST',
-      headers: {
-        ...(this.token && { Authorization: `Bearer ${this.token}` }),
-      },
-      body: formData,
+      body: JSON.stringify({ csvData }),
     });
   }
 
-  async exportBuyers(params: any = {}) {
+  async exportBuyers(filters: BuyerFiltersType = {}): Promise<string> {
     const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== '') {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== '' && value !== null) {
         searchParams.append(key, value.toString());
       }
     });
@@ -124,7 +110,7 @@ class ApiClient {
       throw new Error('Export failed');
     }
 
-    return response.blob();
+    return response.text();
   }
 }
 

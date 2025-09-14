@@ -1,4 +1,4 @@
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import { BuyerFiltersType } from '@/lib/zod-schemas';
 import BuyersTableClient from './BuyersTableClient';
 import Pagination from './Pagination';
@@ -9,7 +9,7 @@ interface BuyersListProps {
 }
 
 export default async function BuyersList({ filters }: BuyersListProps) {
-  const response = await mockApi.getBuyers(filters);
+  const response = await apiClient.getBuyers(filters);
 
   if (response.items.length === 0) {
     return (

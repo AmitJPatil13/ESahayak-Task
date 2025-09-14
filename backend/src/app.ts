@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { createServer } from 'http';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth';
 import buyerRoutes from './routes/buyers';
@@ -10,7 +11,7 @@ import { authenticateToken } from './middleware/auth';
 
 const app = express();
 const prisma = new PrismaClient();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 
 // Security middleware
 app.use(helmet());
@@ -62,9 +63,17 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-app.listen(PORT, () => {
+const server = createServer(app);
+
+// Initialize WebSocket
+import('./websocket').then(({ setupWebSocket }) => {
+  setupWebSocket(server);
+});
+
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔌 Real-time features ready`);
 });
 
 export default app;

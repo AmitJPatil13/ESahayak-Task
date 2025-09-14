@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import BuyerForm from '../../BuyerForm';
 import BackButton from '@/components/BackButton';
 import { Edit3 } from 'lucide-react';
@@ -12,7 +12,7 @@ interface EditBuyerPageProps {
 export default async function EditBuyerPage({ params }: EditBuyerPageProps) {
   try {
     const { id } = await params;
-    const buyer = await mockApi.getBuyer(id);
+    const buyer = await apiClient.getBuyer(id);
     
     if (!buyer) {
       notFound();

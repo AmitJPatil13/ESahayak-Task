@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import BuyerDetails from './BuyerDetails';
 import BackButton from '@/components/BackButton';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -24,7 +24,7 @@ export default function BuyerPage() {
           return;
         }
 
-        const data = await mockApi.getBuyer(id);
+        const data = await apiClient.getBuyer(id);
         if (!data) {
           setError(true);
           return;

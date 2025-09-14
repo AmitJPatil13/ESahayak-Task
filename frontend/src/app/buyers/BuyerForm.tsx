@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/lib/mockApi';
-import { BuyerCreateType } from '@/lib/zod-schemas';
+import { Save, X, Upload } from 'lucide-react';
+import { BuyerCreateType, BuyerUpdateType, BuyerType } from '@/lib/zod-schemas';
+import { apiClient } from '@/lib/api';
+import { useWebSocket } from '@/hooks/useWebSocket';
 import LoadingButton from '@/components/LoadingButton';
 import { BuyerCreate, City, PropertyType, BHK, Purpose, Timeline, Source, Status } from '@/lib/zod-schemas';
 import { useToast } from '@/contexts/ToastContext';
@@ -14,11 +16,11 @@ interface BuyerFormProps {
   buyerId?: string;
 }
 
-export default function BuyerForm({ buyer }: { buyer?: any }) {
+export default function BuyerForm({ initialData, isEdit = false, buyerId }: BuyerFormProps) {
   const router = useRouter();
   const { showSuccess, showError } = useToast();
-  const isEdit = !!buyer;
-  const buyerId = buyer?.id;
+  const [loading, setLoading] = useState(false);
+  const { notifyBuyerCreate, notifyBuyerUpdate } = useWebSocket();
   const [formData, setFormData] = useState<Partial<BuyerCreateType>>({
     fullName: '',
     email: '',
@@ -34,7 +36,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
     status: 'New',
     tags: [],
     notes: '',
-    ...buyer,
+    ...initialData,
   });
   
   // Set default BHK for Apartment/Villa
@@ -83,7 +85,7 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
     setIsSubmitting(true);
     try {
       if (isEdit && buyerId) {
-        await mockApi.updateBuyer(buyerId, {
+        await apiClient.updateBuyer(buyerId, {
           ...formData as BuyerCreateType,
           id: buyerId,
           updatedAt: new Date().toISOString(),
@@ -91,14 +93,14 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
       } else {
         const validationData = {
           ...formData,
-          email: formData.email || undefined,
-          notes: formData.notes || undefined,
+          email: formData.email && formData.email.trim() !== '' ? formData.email : undefined,
+          notes: formData.notes && formData.notes.trim() !== '' ? formData.notes : undefined,
           budgetMin: formData.budgetMin ? Number(formData.budgetMin) : undefined,
           budgetMax: formData.budgetMax ? Number(formData.budgetMax) : undefined,
         };
         
         console.log('Creating buyer with data:', validationData);
-        const newBuyer = await mockApi.createBuyer(validationData as BuyerCreateType);
+        const newBuyer = await apiClient.createBuyer(validationData as BuyerCreateType);
         console.log('Buyer created successfully:', newBuyer);
         
         // Show professional success toast
@@ -107,7 +109,10 @@ export default function BuyerForm({ buyer }: { buyer?: any }) {
           `${validationData.fullName} has been added to your buyers database.`
         );
         
-        // Clear form after successful creation
+        // Notify other users about the new buyer
+        notifyBuyerCreate('buyer-created');
+        
+        // Clear form 
         setFormData({
           fullName: '',
           email: '',

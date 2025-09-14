@@ -18,7 +18,8 @@ export const BuyerSchema = z.object({
   email: z.string()
     .email('Invalid email format')
     .optional()
-    .or(z.literal('')),
+    .or(z.literal(''))
+    .transform(val => val === '' ? undefined : val),
   
   phone: z.string()
     .regex(/^\d{10,15}$/, 'Phone must be 10-15 digits'),
@@ -47,7 +48,8 @@ export const BuyerSchema = z.object({
   notes: z.string()
     .max(1000, 'Notes must be at most 1000 characters')
     .optional()
-    .or(z.literal('')),
+    .or(z.literal(''))
+    .transform(val => val === '' ? undefined : val),
   
   tags: z.array(z.string()).default([]),
 }).refine((data) => {
@@ -71,9 +73,54 @@ export const BuyerSchema = z.object({
 });
 
 export const CreateBuyerSchema = BuyerSchema;
-export const UpdateBuyerSchema = BuyerSchema.partial().extend({
-  updatedAt: z.string().datetime().optional() // For concurrency control
+
+// Create a base object without refinements for UpdateBuyerSchema
+const BaseBuyerSchema = z.object({
+  fullName: z.string()
+    .min(2, 'Full name must be at least 2 characters')
+    .max(80, 'Full name must be at most 80 characters'),
+  
+  email: z.string()
+    .email('Invalid email format')
+    .optional()
+    .or(z.literal(''))
+    .transform(val => val === '' ? undefined : val),
+  
+  phone: z.string()
+    .regex(/^\d{10,15}$/, 'Phone must be 10-15 digits'),
+  
+  city: CityEnum,
+  propertyType: PropertyTypeEnum,
+  bhk: BHKEnum.optional(),
+  purpose: PurposeEnum,
+  
+  budgetMin: z.number()
+    .int()
+    .positive('Budget minimum must be positive')
+    .optional(),
+  
+  budgetMax: z.number()
+    .int()
+    .positive('Budget maximum must be positive')
+    .optional(),
+  
+  timeline: TimelineEnum,
+  source: SourceEnum,
+  status: StatusEnum.default('New'),
+  
+  notes: z.string()
+    .max(1000, 'Notes must be at most 1000 characters')
+    .optional()
+    .or(z.literal(''))
+    .transform(val => val === '' ? undefined : val),
+  
+  tags: z.array(z.string()).default([]),
 });
+
+export const UpdateBuyerSchema = BaseBuyerSchema.extend({
+  id: z.string().uuid(),
+  updatedAt: z.string().datetime().optional()
+}).partial().required({ id: true });
 
 // Query schemas for filtering and pagination
 export const BuyerQuerySchema = z.object({

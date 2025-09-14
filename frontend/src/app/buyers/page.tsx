@@ -8,8 +8,9 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Navbar from '@/components/Navbar';
 import BuyersTable from './BuyersTable';
 import BuyerFilters from './BuyerFilters';
-import { mockApi } from '@/lib/mockApi';
+import { apiClient } from '@/lib/api';
 import { BuyerType, BuyerFiltersType } from '@/lib/zod-schemas';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 export default function BuyersPage() {
   const router = useRouter();
@@ -20,6 +21,9 @@ export default function BuyersPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [totalBuyers, setTotalBuyers] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  
+  // Real-time WebSocket connection
+  const { isConnected, notifyBuyerUpdate, notifyBuyerCreate, notifyBuyerDelete } = useWebSocket();
 
   // URL-synced state
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -67,7 +71,7 @@ export default function BuyersPage() {
         order: sortOrder as any,
       };
 
-      const response = await mockApi.getBuyers(filters);
+      const response = await apiClient.getBuyers(filters);
       setBuyers(response.items);
       setTotalBuyers(response.total);
       setTotalPages(Math.ceil(response.total / 10));
@@ -83,6 +87,20 @@ export default function BuyersPage() {
   useEffect(() => {
     loadBuyers();
   }, [currentPage, searchQuery, statusFilter, cityFilter, propertyTypeFilter, sortBy, sortOrder]);
+
+  // Listen for real-time updates
+  useEffect(() => {
+    const handleBuyerRefresh = () => {
+      console.log('🔄 Real-time update received, refreshing buyers data...');
+      loadBuyers();
+    };
+
+    window.addEventListener('buyer:refresh', handleBuyerRefresh);
+    
+    return () => {
+      window.removeEventListener('buyer:refresh', handleBuyerRefresh);
+    };
+  }, []);
 
   // Debounced search
   const [searchInput, setSearchInput] = useState(searchQuery);
@@ -134,6 +152,8 @@ export default function BuyersPage() {
   // Handle buyer deletion
   const handleBuyerDeleted = () => {
     loadBuyers();
+    // Notify other connected users about the deletion
+    notifyBuyerDelete('buyer-deleted');
   };
 
   return (
@@ -253,7 +273,15 @@ export default function BuyersPage() {
             <div className="glass-card rounded-2xl overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-primary">All Buyers</h2>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-semibold text-primary">All Buyers</h2>
+                    {isConnected && (
+                      <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-xs text-green-400 font-medium">Live</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="text-sm text-secondary">
                     Showing {((currentPage - 1) * 10) + 1}-{Math.min(currentPage * 10, totalBuyers)} of {totalBuyers} results
                   </div>

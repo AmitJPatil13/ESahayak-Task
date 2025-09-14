@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  name      String?
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  buyers Buyer[]
+  buyerHistoryChanges BuyerHistory[] @relation("UserChanges")
+
+  @@map("users")
+}
+
+model Buyer {
+  id           String   @id @default(uuid())
+  fullName     String
+  email        String?
+  phone        String
+  city         String   // Chandigarh, Mohali, Zirakpur, Panchkula, Other
+  propertyType String   // Apartment, Villa, Plot, Office, Retail
+  bhk          String?  // 1, 2, 3, 4, Studio
+  purpose      String   // Buy, Rent
+  budgetMin    Int?
+  budgetMax    Int?
+  timeline     String   // 0-3m, 3-6m, >6m, Exploring
+  source       String   // Website, Referral, Walk-in, Call, Other
+  notes        String?
+  tags         String[] @default([])
+  status       String   @default("New") // New, Qualified, Contacted, Visited, Negotiation, Converted, Dropped
+  ownerId      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  owner   User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  history BuyerHistory[]
+
+  // Indexes for performance
+  @@index([ownerId])
+  @@index([status])
+  @@index([city])
+  @@index([propertyType])
+  @@index([createdAt])
+  @@index([updatedAt])
+
+  @@map("buyers")
+}
+
+model BuyerHistory {
+  id        String   @id @default(uuid())
+  buyerId   String
+  changedBy String
+  changedAt DateTime @default(now())
+  diff      Json
+
+  // Relations
+  buyer     Buyer @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  changedByUser User  @relation("UserChanges", fields: [changedBy], references: [id], onDelete: Cascade)
+
+  @@index([buyerId])
+  @@index([changedAt])
+  @@index([changedBy])
+
+  @@map("buyer_history")
+}

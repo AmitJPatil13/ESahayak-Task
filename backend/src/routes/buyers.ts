@@ -1,5 +1,4 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth';
 import { 
   BuyerQuerySchema, 
@@ -11,9 +10,14 @@ import csv from 'csv-parser';
 import { createObjectCsvWriter } from 'csv-writer';
 import multer from 'multer';
 import { Readable } from 'stream';
+import prisma from '../lib/prisma';
+
+// Extend the AuthRequest to include the file property
+interface MulterRequest extends AuthRequest {
+  file?: Express.Multer.File;
+}
 
 const router = express.Router();
-const prisma = new PrismaClient();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // GET /buyers - List buyers with pagination, filtering, and search
@@ -119,12 +123,7 @@ router.get('/:id', async (req: AuthRequest, res, next) => {
         },
         history: {
           take: 5,
-          orderBy: { changedAt: 'desc' },
-          include: {
-            user: {
-              select: { name: true, email: true }
-            }
-          }
+          orderBy: { changedAt: 'desc' }
         }
       }
     });
@@ -247,7 +246,7 @@ router.delete('/:id', async (req: AuthRequest, res, next) => {
 });
 
 // POST /buyers/import - CSV import (max 200 rows)
-router.post('/import', upload.single('file'), async (req: AuthRequest, res, next) => {
+router.post('/import', upload.single('file'), async (req: AuthRequest & MulterRequest, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'CSV file is required' });
